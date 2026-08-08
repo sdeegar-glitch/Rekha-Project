@@ -25,40 +25,34 @@ export async function GET(request: NextRequest) {
     const endOfDay = new Date(date)
     endOfDay.setHours(23, 59, 59, 999)
 
-    // Find availabilities for this service and day of week
-    const dayOfWeek = date.getDay()
-    
-    const availabilities = await db.availability.findMany({
+    const timeSlots = await db.timeSlot.findMany({
       where: {
-        serviceId,
-        isActive: true,
         OR: [
-          { dayOfWeek, recurrence: { not: 'NONE' } },
-          { specificDate: { gte: startOfDay, lte: endOfDay } },
+          { serviceId },
+          { serviceId: null, availability: { serviceId } }
         ],
+        status: 'AVAILABLE',
+        startTime: { gte: startOfDay, lte: endOfDay },
+        availability: {
+          isActive: true
+        }
       },
       include: {
-        timeSlots: {
-          where: {
-            startTime: { gte: startOfDay, lte: endOfDay },
-            status: 'AVAILABLE',
-          },
-          orderBy: { startTime: 'asc' },
-        },
+        availability: {
+          select: { serviceId: true }
+        }
       },
+      orderBy: { startTime: 'asc' },
     })
 
-    // Flatten and format slots
-    const slots = availabilities.flatMap((avail) =>
-      avail.timeSlots.map((slot) => ({
-        id: slot.id,
-        startTime: slot.startTime.toISOString(),
-        endTime: slot.endTime.toISOString(),
-        status: slot.status,
-        serviceId: slot.serviceId || avail.serviceId,
-        availabilityId: avail.id,
-      }))
-    )
+    const slots = timeSlots.map((slot) => ({
+      id: slot.id,
+      startTime: slot.startTime.toISOString(),
+      endTime: slot.endTime.toISOString(),
+      status: slot.status,
+      serviceId: slot.serviceId || slot.availability.serviceId,
+      availabilityId: slot.availabilityId,
+    }))
 
     return NextResponse.json({ slots })
   } catch (error) {
