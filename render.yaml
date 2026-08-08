@@ -1,0 +1,37 @@
+services:
+  # 1. Main Next.js Application
+  - type: web
+    name: rekha-patel-web
+    env: node
+    buildCommand: npm install && npm run db:generate && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # Must be set in Render Dashboard (Supabase Transaction Pooler URL)
+      - key: DIRECT_URL
+        sync: false # Must be set in Render Dashboard (Supabase Session Pooler URL)
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        sync: false # Must be set to your Render URL (e.g. https://rekha-patel-web.onrender.com)
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+
+  # 2. Socket.io Server
+  - type: web
+    name: rekha-patel-socket
+    env: node
+    buildCommand: npm install
+    startCommand: npm run start:socket
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # We don't strictly need the DB URL here unless the socket server accesses the DB directly
