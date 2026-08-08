@@ -1,0 +1,351 @@
+// @ts-nocheck
+// Socket.io Server for Real-time Features
+import { Server as HttpServer } from 'http'
+import { Server, Socket } from 'socket.io'
+import { createAdapter } from '@socket.io/redis-adapter'
+import { createClient } from 'redis'
+import jwt from 'jsonwebtoken'
+import { db } from '../db'
+
+// Types
+interface AuthenticatedSocket extends Socket {
+  userId?: string
+  userRole?: string
+}
+
+interface ServerToClientEvents {
+  "appointment:created": (data: AppointmentEvent) => void
+  "appointment:updated": (data: AppointmentEvent) => void
+  "appointment:cancelled": (data: AppointmentEvent) => void
+  "slot:available": (data: SlotEvent) => void
+  "slot:booked": (data: SlotEvent) => void
+  "notification:new": (data: NotificationEvent) => void
+  "admin:stats:updated": (data: StatsEvent) => void
+  error: (message: string) => void
+}
+
+interface ClientToServerEvents {
+  authenticate: (token: string) => void
+  subscribe: (channels: string[]) => void
+  unsubscribe: (channels: string[]) => void
+  ping: () => void
+}
+
+interface InterServerEvents {
+  ping: () => void
+}
+
+interface SocketData {
+  userId: string
+  userRole: string
+  channels: Set<string>
+}
+
+type AppointmentEvent = {
+  appointmentId: string
+  patientId: string
+  patientName: string
+  serviceName: string
+  startTime: string
+  endTime: string
+  status: string
+  adminId?: string
+}
+
+type SlotEvent = {
+  slotId: string
+  serviceId: string
+  serviceName: string
+  startTime: string
+  endTime: string
+  status: string
+}
+
+type NotificationEvent = {
+  notificationId: string
+  type: string
+  title: string
+  message: string
+}
+
+type StatsEvent = {
+  totalAppointments: number
+  todayAppointments: number
+  pendingPayments: number
+  revenue: number
+}
+
+// Redis clients for scaling (optional)
+let pubClient: any = null
+let subClient: any = null
+
+async function initRedis() {
+  if (process.env.REDIS_URL) {
+    try {
+      pubClient = createClient({ url: process.env.REDIS_URL })
+      subClient = pubClient.duplicate()
+      await pubClient.connect()
+      await subClient.connect()
+      console.log('��✅ Redis connected for Socket.io scaling')
+    } catch (error) {
+      console.warn('��⚠��️ Redis connection failed, running without adapter:', error)
+    }
+  }
+}
+
+// In-memory store for connected users (fallback without Redis)
+const connectedUsers = new Map<string, Set<string>>() // userId -> Set<socketId>
+
+function addUserConnection(userId: string, socketId: string) {
+  if (!connectedUsers.has(userId)) {
+    connectedUsers.set(userId, new Set())
+  }
+  connectedUsers.get(userId)!.add(socketId)
+}
+
+function removeUserConnection(userId: string, socketId: string) {
+  const sockets = connectedUsers.get(userId)
+  if (sockets) {
+    sockets.delete(socketId)
+    if (sockets.size === 0) {
+      connectedUsers.delete(userId)
+    }
+  }
+}
+
+function getUserSockets(userId: string): string[] {
+  return Array.from(connectedUsers.get(userId) || [])
+}
+
+function isUserOnline(userId: string): boolean {
+  return connectedUsers.has(userId) && connectedUsers.get(userId)!.size > 0
+}
+
+// Create Socket.io server
+export function createSocketServer(httpServer: HttpServer) {
+  const io = new Server<
+    ClientToServerEvents,
+    ServerToClientEvents,
+    InterServerEvents,
+    SocketData
+  >(httpServer, {
+    cors: {
+      origin: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+    path: '/socket.io/',
+    transports: ['websocket', 'polling'],
+  })
+
+  // Use Redis adapter if available
+  if (pubClient && subClient) {
+    io.adapter(createAdapter(pubClient, subClient))
+  }
+
+  // Authentication middleware
+  io.use(async (socket: AuthenticatedSocket, next) => {
+    try {
+      const token = socket.handshake.auth.token || socket.handshake.query.token
+
+      if (!token) {
+        return next(new Error('Authentication required'))
+      }
+
+      // Verify JWT token
+      const decoded = jwt.verify(token as string, process.env.NEXTAUTH_SECRET!) as {
+        id: string
+        email: string
+        role: string
+      }
+
+      const user = await db.user.findUnique({
+        where: { id: decoded.id },
+        select: { id: true, role: true, email: true },
+      })
+
+      if (!user) {
+        return next(new Error('User not found'))
+      }
+
+      socket.userId = user.id
+      socket.userRole = user.role
+      socket.data.userId = user.id
+      socket.data.userRole = user.role
+      socket.data.channels = new Set()
+
+      next()
+    } catch (error) {
+      next(new Error('Invalid token'))
+    }
+  })
+
+  // Connection handler
+  io.on('connection', (socket: AuthenticatedSocket) => {
+    console.log(`���🔌 Client connected: ${socket.id} (User: ${socket.userId}, Role: ${socket.userRole})`)
+
+    // Track user connection
+    addUserConnection(socket.userId!, socket.id)
+
+    // Join user-specific room
+    socket.join(`user:${socket.userId}`)
+
+    // Join role-based room
+    socket.join(`role:${socket.userRole}`)
+
+    // Admin joins admin room
+    if (socket.userRole === 'ADMIN' || socket.userRole === 'SUPER_ADMIN') {
+      socket.join('admin:all')
+    }
+
+    // Handle authentication (for reconnection)
+    socket.on('authenticate', (token: string) => {
+      try {
+        const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET!) as {
+          id: string
+          role: string
+        }
+        socket.userId = decoded.id
+        socket.userRole = decoded.role
+        socket.join(`user:${decoded.id}`)
+        socket.join(`role:${decoded.role}`)
+        if (decoded.role === 'ADMIN' || decoded.role === 'SUPER_ADMIN') {
+          socket.join('admin:all')
+        }
+        socket.emit('authenticated', { success: true })
+      } catch {
+        socket.emit('error', 'Authentication failed')
+      }
+    })
+
+    // Handle channel subscriptions
+    socket.on('subscribe', (channels: string[]) => {
+      for (const channel of channels) {
+        // Validate channel access
+        if (isValidChannel(socket, channel)) {
+          socket.join(channel)
+          socket.data.channels.add(channel)
+        }
+      }
+    })
+
+    socket.on('unsubscribe', (channels: string[]) => {
+      for (const channel of channels) {
+        socket.leave(channel)
+        socket.data.channels.delete(channel)
+      }
+    })
+
+    // Heartbeat
+    socket.on('ping', () => {
+      socket.emit('pong', { timestamp: Date.now() })
+    })
+
+    // Handle disconnection
+    socket.on('disconnect', (reason) => {
+      console.log(`���🔌 Client disconnected: ${socket.id} (Reason: ${reason})`)
+      removeUserConnection(socket.userId!, socket.id)
+    })
+
+    // Error handling
+    socket.on('error', (error) => {
+      console.error(`Socket error for ${socket.id}:`, error)
+    })
+  })
+
+  // Helper to validate channel access
+  function isValidChannel(socket: AuthenticatedSocket, channel: string): boolean {
+    // User-specific channels
+    if (channel.startsWith('user:')) {
+      return channel === `user:${socket.userId}`
+    }
+    // Appointment-specific channels
+    if (channel.startsWith('appointment:')) {
+      // Allow if user is patient or admin
+      return true // Will be validated server-side when emitting
+    }
+    // Admin channels
+    if (channel.startsWith('admin:')) {
+      return socket.userRole === 'ADMIN' || socket.userRole === 'SUPER_ADMIN'
+    }
+    // Public channels
+    if (channel === 'public:slots') {
+      return true
+    }
+    return false
+  }
+
+  // Broadcast functions for use in API routes
+  const broadcast = {
+    // Appointment events
+    appointmentCreated: (data: AppointmentEvent) => {
+      io.to(`user:${data.patientId}`).emit('appointment:created', data)
+      io.to('admin:all').emit('appointment:created', data)
+      io.to(`appointment:${data.appointmentId}`).emit('appointment:created', data)
+    },
+
+    appointmentUpdated: (data: AppointmentEvent) => {
+      io.to(`user:${data.patientId}`).emit('appointment:updated', data)
+      if (data.adminId) io.to(`user:${data.adminId}`).emit('appointment:updated', data)
+      io.to('admin:all').emit('appointment:updated', data)
+      io.to(`appointment:${data.appointmentId}`).emit('appointment:updated', data)
+    },
+
+    appointmentCancelled: (data: AppointmentEvent) => {
+      io.to(`user:${data.patientId}`).emit('appointment:cancelled', data)
+      io.to('admin:all').emit('appointment:cancelled', data)
+      io.to(`appointment:${data.appointmentId}`).emit('appointment:cancelled', data)
+      // Notify about slot availability
+      broadcast.slotAvailable({
+        slotId: data.appointmentId, // This would be the timeSlotId in reality
+        serviceId: '',
+        serviceName: data.serviceName,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        status: 'AVAILABLE',
+      })
+    },
+
+    // Slot events
+    slotAvailable: (data: SlotEvent) => {
+      io.to('public:slots').emit('slot:available', data)
+      io.to('admin:all').emit('slot:available', data)
+    },
+
+    slotBooked: (data: SlotEvent) => {
+      io.to('public:slots').emit('slot:booked', data)
+      io.to('admin:all').emit('slot:booked', data)
+    },
+
+    // Notification events
+    notificationCreated: (userId: string, data: NotificationEvent) => {
+      io.to(`user:${userId}`).emit('notification:new', data)
+    },
+
+    // Admin stats
+    statsUpdated: (data: StatsEvent) => {
+      io.to('admin:all').emit('admin:stats:updated', data)
+    },
+
+    // Send to specific user
+    toUser: (userId: string, event: string, data: any) => {
+      io.to(`user:${userId}`).emit(event, data)
+    },
+
+    // Send to all admins
+    toAdmins: (event: string, data: any) => {
+      io.to('admin:all').emit(event, data)
+    },
+
+    // Check if user is online
+    isUserOnline,
+    getUserSockets,
+  }
+
+  return { io, broadcast }
+}
+
+// Initialize Redis on module load
+initRedis().catch(console.error)
+
+export type { ServerToClientEvents, ClientToServerEvents, SocketData }

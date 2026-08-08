@@ -1,0 +1,22 @@
+# Dockerfile for Socket.io Server
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN npx prisma generate
+
+# Copy source code
+COPY src/lib/socket ./src/lib/socket
+COPY src/lib/db.ts ./src/lib/db.ts
+
+# Expose port
+EXPOSE 3001
+
+# Start the socket server
+CMD ["npx", "tsx", "src/lib/socket/server.ts"]
