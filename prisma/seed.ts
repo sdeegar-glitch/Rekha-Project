@@ -20,30 +20,34 @@ async function main() {
   })
   console.log('Admin user created:', admin.email)
 
+  // Clean up old services and slots if needed
+  await prisma.timeSlot.deleteMany()
+  await prisma.availability.deleteMany()
+  
   // 2. Create Default Services
   const initialConsultation = await prisma.service.upsert({
-    where: { id: 'service_initial_consult' },
+    where: { id: 'individual-therapy' },
     update: {},
     create: {
-      id: 'service_initial_consult',
-      name: 'Initial Consultation',
-      description: 'A 60-minute initial evaluation and discussion of your needs.',
-      duration: 60,
-      price: 1500,
+      id: 'individual-therapy',
+      name: 'Individual Therapy',
+      description: 'One-on-one psychotherapy sessions.',
+      duration: 50,
+      price: 2500,
       color: '#3B82F6', // Blue
       sortOrder: 1,
     },
   })
 
   const therapySession = await prisma.service.upsert({
-    where: { id: 'service_therapy' },
+    where: { id: 'cbt' },
     update: {},
     create: {
-      id: 'service_therapy',
-      name: 'Therapy Session',
+      id: 'cbt',
+      name: 'Cognitive Behavioral Therapy (CBT)',
       description: 'Standard 45-minute psychotherapy session.',
-      duration: 45,
-      price: 1200,
+      duration: 50,
+      price: 2500,
       color: '#10B981', // Green
       sortOrder: 2,
     },
