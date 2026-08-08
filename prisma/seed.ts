@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -68,7 +68,7 @@ async function main() {
   })
 
   // Generate some slots for the next 7 days to ensure booking calendar works immediately
-  const slotsToCreate = []
+  const slotsToCreate: Prisma.TimeSlotCreateManyInput[] = []
   for (let i = 1; i <= 7; i++) {
     const slotDate = new Date(today)
     slotDate.setDate(today.getDate() + i)
@@ -107,7 +107,6 @@ async function main() {
   // We can't use upsert with createMany easily, so we just clear and create if none exist
   const existingSlots = await prisma.timeSlot.count()
   if (existingSlots === 0) {
-    // @ts-ignore
     await prisma.timeSlot.createMany({
       data: slotsToCreate,
     })
