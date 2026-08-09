@@ -73,7 +73,8 @@ export function useSocket(options: UseSocketOptions = {}) {
   useEffect(() => {
     if (!autoConnect) return
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
+    // Connect to same origin in production (Render), or localhost:3001 in development
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001')
 
     socketRef.current = io(socketUrl, {
       path: '/socket.io/',

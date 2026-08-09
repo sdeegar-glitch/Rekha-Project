@@ -154,7 +154,11 @@ export function createSocketServer(httpServer: HttpServer) {
       const token = socket.handshake.auth.token || socket.handshake.query.token
 
       if (!token) {
-        return next(new Error('Authentication required'))
+        // Allow guest connections for public real-time features (like slot booking)
+        socket.userRole = 'GUEST'
+        socket.data.userRole = 'GUEST'
+        socket.data.channels = new Set()
+        return next()
       }
 
       // Verify JWT token
@@ -170,7 +174,11 @@ export function createSocketServer(httpServer: HttpServer) {
       })
 
       if (!user) {
-        return next(new Error('User not found'))
+        // If token is invalid or user deleted, fallback to guest
+        socket.userRole = 'GUEST'
+        socket.data.userRole = 'GUEST'
+        socket.data.channels = new Set()
+        return next()
       }
 
       socket.userId = user.id
@@ -181,22 +189,29 @@ export function createSocketServer(httpServer: HttpServer) {
 
       next()
     } catch (error) {
-      next(new Error('Invalid token'))
+      // If token is expired or malformed, fallback to guest
+      socket.userRole = 'GUEST'
+      socket.data.userRole = 'GUEST'
+      socket.data.channels = new Set()
+      next()
     }
   })
 
   // Connection handler
   io.on('connection', (socket: AuthenticatedSocket) => {
-    console.log(`���🔌 Client connected: ${socket.id} (User: ${socket.userId}, Role: ${socket.userRole})`)
+    console.log(`🔌 Client connected: ${socket.id} (User: ${socket.userId || 'Guest'}, Role: ${socket.userRole})`)
 
     // Track user connection
-    addUserConnection(socket.userId!, socket.id)
-
-    // Join user-specific room
-    socket.join(`user:${socket.userId}`)
+    if (socket.userId) {
+      addUserConnection(socket.userId, socket.id)
+      // Join user-specific room
+      socket.join(`user:${socket.userId}`)
+    }
 
     // Join role-based room
-    socket.join(`role:${socket.userRole}`)
+    if (socket.userRole) {
+      socket.join(`role:${socket.userRole}`)
+    }
 
     // Admin joins admin room
     if (socket.userRole === 'ADMIN' || socket.userRole === 'SUPER_ADMIN') {
@@ -404,5 +419,21 @@ export function createSocketServer(httpServer: HttpServer) {
 
 // Initialize Redis on module load
 initRedis().catch(console.error)
+
+// If run directly via tsx, start a standalone server
+if (process.argv[1]?.includes('server.ts') || process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.SOCKET_PORT || 3001
+  const { createServer } = require('http')
+  const httpServer = createServer((req: any, res: any) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' })
+    res.end('Socket.io server running\n')
+  })
+  
+  createSocketServer(httpServer)
+  
+  httpServer.listen(PORT, () => {
+    console.log(`🔌 Standalone Socket.io server listening on port ${PORT}`)
+  })
+}
 
 export type { ServerToClientEvents, ClientToServerEvents, SocketData }

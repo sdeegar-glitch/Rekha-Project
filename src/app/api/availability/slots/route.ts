@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       startTime: slot.startTime.toISOString(),
       endTime: slot.endTime.toISOString(),
       status: slot.status,
-      serviceId: slot.serviceId || slot.availability.serviceId,
+      serviceId: slot.serviceId || slot.availability?.serviceId,
       availabilityId: slot.availabilityId,
     }))
 
