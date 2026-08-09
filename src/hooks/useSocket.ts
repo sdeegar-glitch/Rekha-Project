@@ -11,6 +11,8 @@ type ServerToClientEvents = {
   'appointment:cancelled': (data: any) => void
   'slot:available': (data: any) => void
   'slot:booked': (data: any) => void
+  'slot:locked': (data: { slotId: string, userId: string, expiresAt: number }) => void
+  'slot:unlocked': (data: { slotId: string }) => void
   'notification:new': (data: any) => void
   'admin:stats:updated': (data: any) => void
   error: (message: string) => void
@@ -23,6 +25,8 @@ type ClientToServerEvents = {
   subscribe: (channels: string[]) => void
   unsubscribe: (channels: string[]) => void
   ping: () => void
+  'lock:slot': (slotId: string) => void
+  'unlock:slot': (slotId: string) => void
 }
 
 type SocketType = Socket<ServerToClientEvents, ClientToServerEvents>
@@ -35,6 +39,8 @@ interface UseSocketOptions {
   onAppointmentCancelled?: (data: any) => void
   onSlotAvailable?: (data: any) => void
   onSlotBooked?: (data: any) => void
+  onSlotLocked?: (data: { slotId: string, userId: string, expiresAt: number }) => void
+  onSlotUnlocked?: (data: { slotId: string }) => void
   onNotification?: (data: any) => void
   onStatsUpdated?: (data: any) => void
   onError?: (error: string) => void
@@ -49,6 +55,8 @@ export function useSocket(options: UseSocketOptions = {}) {
     onAppointmentCancelled,
     onSlotAvailable,
     onSlotBooked,
+    onSlotLocked,
+    onSlotUnlocked,
     onNotification,
     onStatsUpdated,
     onError
@@ -142,17 +150,27 @@ export function useSocket(options: UseSocketOptions = {}) {
     })
 
     socket.on('slot:available', (data) => {
-      console.log('���🎯 Slot available:', data)
+      console.log('🎯 Slot available:', data)
       onSlotAvailable?.(data)
     })
 
     socket.on('slot:booked', (data) => {
-      console.log('���🎯 Slot booked:', data)
+      console.log('🎯 Slot booked:', data)
       onSlotBooked?.(data)
     })
 
+    socket.on('slot:locked', (data) => {
+      console.log('🔒 Slot locked:', data)
+      onSlotLocked?.(data)
+    })
+
+    socket.on('slot:unlocked', (data) => {
+      console.log('🔓 Slot unlocked:', data)
+      onSlotUnlocked?.(data)
+    })
+
     socket.on('notification:new', (data) => {
-      console.log('��🔔 New notification:', data)
+      console.log('🔔 New notification:', data)
       onNotification?.(data)
     })
 
@@ -181,6 +199,8 @@ export function useSocket(options: UseSocketOptions = {}) {
     onAppointmentCancelled,
     onSlotAvailable,
     onSlotBooked,
+    onSlotLocked,
+    onSlotUnlocked,
     onNotification,
     onStatsUpdated,
     onError
@@ -213,6 +233,18 @@ export function useSocket(options: UseSocketOptions = {}) {
     }
   }, [])
 
+  const emitLockSlot = useCallback((slotId: string) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('lock:slot', slotId)
+    }
+  }, [])
+
+  const emitUnlockSlot = useCallback((slotId: string) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('unlock:slot', slotId)
+    }
+  }, [])
+
   return {
     socket: socketRef.current,
     isConnected,
@@ -220,7 +252,9 @@ export function useSocket(options: UseSocketOptions = {}) {
     subscribe,
     unsubscribe,
     reconnect,
-    disconnect
+    disconnect,
+    emitLockSlot,
+    emitUnlockSlot
   }
 }
 
@@ -281,16 +315,46 @@ export function useSlotAvailability(serviceId?: string, date?: string) {
             : s
         )
       )
+    },
+    onSlotLocked: (data) => {
+      setSlots((prev) =>
+        prev.map((s) =>
+          s.id === data.slotId || s.slotId === data.slotId
+            ? { ...s, status: 'LOCKED', lockedBy: data.userId, expiresAt: data.expiresAt }
+            : s
+        )
+      )
+    },
+    onSlotUnlocked: (data) => {
+      setSlots((prev) =>
+        prev.map((s) =>
+          (s.id === data.slotId || s.slotId === data.slotId) && s.status === 'LOCKED'
+            ? { ...s, status: 'AVAILABLE', lockedBy: undefined, expiresAt: undefined }
+            : s
+        )
+      )
     }
   })
 
-  return { slots, isConnected, loading }
+  return { slots, isConnected, loading, setSlots }
 }
 
 // Hook for notifications
 export function useNotifications() {
   const [notifications, setNotifications] = useState<any[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/notifications')
+      .then(res => res.json())
+      .then(data => {
+        if (data.notifications) {
+          setNotifications(data.notifications)
+          setUnreadCount(data.notifications.filter((n: any) => !n.read).length)
+        }
+      })
+      .catch(err => console.error('Error fetching notifications:', err))
+  }, [])
 
   const { isConnected } = useSocket({
     channels: ['notifications'],
@@ -301,15 +365,27 @@ export function useNotifications() {
   })
 
   const markAsRead = useCallback((notificationId: string) => {
+    fetch('/api/notifications', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notificationIds: [notificationId] })
+    }).catch(err => console.error('Error marking notification as read', err))
+
     setNotifications((prev) =>
       prev.map((n) =>
-        n.notificationId === notificationId ? { ...n, read: true } : n
+        n.id === notificationId ? { ...n, read: true } : n
       )
     )
     setUnreadCount((prev) => Math.max(0, prev - 1))
   }, [])
 
   const markAllAsRead = useCallback(() => {
+    fetch('/api/notifications', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markAll: true })
+    }).catch(err => console.error('Error marking all notifications as read', err))
+
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
     setUnreadCount(0)
   }, [])

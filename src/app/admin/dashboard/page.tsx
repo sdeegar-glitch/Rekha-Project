@@ -50,7 +50,7 @@ export default function AdminDashboard() {
     // Fetch dashboard stats as fallback
     const fetchStats = async () => {
       try {
-        const res = await fetch('/api/admin/dashboard/stats')
+        const res = await fetch('/api/admin/stats')
         if (!res.ok) throw new Error('Failed to fetch stats')
         const data = await res.json()
         setStats(data)

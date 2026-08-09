@@ -21,6 +21,8 @@ interface ServerToClientEvents {
   "slot:booked": (data: SlotEvent) => void
   "notification:new": (data: NotificationEvent) => void
   "admin:stats:updated": (data: StatsEvent) => void
+  "slot:locked": (data: { slotId: string, userId: string, expiresAt: number }) => void
+  "slot:unlocked": (data: { slotId: string }) => void
   error: (message: string) => void
 }
 
@@ -29,6 +31,8 @@ interface ClientToServerEvents {
   subscribe: (channels: string[]) => void
   unsubscribe: (channels: string[]) => void
   ping: () => void
+  "lock:slot": (slotId: string) => void
+  "unlock:slot": (slotId: string) => void
 }
 
 interface InterServerEvents {
@@ -95,6 +99,7 @@ async function initRedis() {
 
 // In-memory store for connected users (fallback without Redis)
 const connectedUsers = new Map<string, Set<string>>() // userId -> Set<socketId>
+const slotLocks = new Map<string, { userId: string, expiresAt: number }>() // slotId -> lock data
 
 function addUserConnection(userId: string, socketId: string) {
   if (!connectedUsers.has(userId)) {
@@ -239,6 +244,58 @@ export function createSocketServer(httpServer: HttpServer) {
     // Heartbeat
     socket.on('ping', () => {
       socket.emit('pong', { timestamp: Date.now() })
+    })
+
+    // Handle Slot Locking
+    socket.on('lock:slot', async (slotId: string) => {
+      if (!socket.userId) return
+      
+      const expiresAt = Date.now() + 5 * 60 * 1000 // 5 minutes
+      
+      if (pubClient) {
+        // SET NX EX (Only set if it does not exist, expiry 300s)
+        const locked = await pubClient.set(`slot:lock:${slotId}`, socket.userId, {
+          EX: 300,
+          NX: true
+        })
+        
+        if (locked) {
+          io.to('public:slots').emit('slot:locked', { slotId, userId: socket.userId, expiresAt })
+        } else {
+          // Check if the current user already owns the lock
+          const existingOwner = await pubClient.get(`slot:lock:${slotId}`)
+          if (existingOwner === socket.userId) {
+             // Refresh lock
+             await pubClient.expire(`slot:lock:${slotId}`, 300)
+             io.to('public:slots').emit('slot:locked', { slotId, userId: socket.userId, expiresAt })
+          }
+        }
+      } else {
+        // Fallback in-memory logic
+        const existingLock = slotLocks.get(slotId)
+        if (!existingLock || existingLock.expiresAt < Date.now() || existingLock.userId === socket.userId) {
+          slotLocks.set(slotId, { userId: socket.userId, expiresAt })
+          io.to('public:slots').emit('slot:locked', { slotId, userId: socket.userId, expiresAt })
+        }
+      }
+    })
+
+    socket.on('unlock:slot', async (slotId: string) => {
+      if (!socket.userId) return
+      
+      if (pubClient) {
+        const owner = await pubClient.get(`slot:lock:${slotId}`)
+        if (owner === socket.userId) {
+          await pubClient.del(`slot:lock:${slotId}`)
+          io.to('public:slots').emit('slot:unlocked', { slotId })
+        }
+      } else {
+        const existingLock = slotLocks.get(slotId)
+        if (existingLock && existingLock.userId === socket.userId) {
+          slotLocks.delete(slotId)
+          io.to('public:slots').emit('slot:unlocked', { slotId })
+        }
+      }
     })
 
     // Handle disconnection

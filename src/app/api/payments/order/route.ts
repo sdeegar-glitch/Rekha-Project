@@ -7,9 +7,6 @@ import { paymentIntentSchema } from '@/validators'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
 
     const body = await request.json()
     const validated = paymentIntentSchema.parse(body)
@@ -24,7 +21,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 })
     }
 
-    if (appointment.patientId !== session.user.id && session.user.role !== 'ADMIN') {
+    // If the user is logged in, ensure they own the appointment (or are an ADMIN)
+    // If they are a guest (no session), we assume they just created it since appointment IDs are UUIDs
+    if (session?.user && session.user.role !== 'ADMIN' && appointment.patientId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

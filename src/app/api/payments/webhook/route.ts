@@ -111,8 +111,15 @@ async function handlePaymentFailed(paymentData: any) {
 
   await db.appointment.update({
     where: { id: payment.appointmentId },
-    data: { status: AppointmentStatus.PENDING },
+    data: { status: AppointmentStatus.CANCELLED },
   })
+  
+  if (payment.appointment.timeSlotId) {
+    await db.timeSlot.update({
+      where: { id: payment.appointment.timeSlotId },
+      data: { status: 'AVAILABLE' },
+    })
+  }
 
   await db.notification.create({
     data: {

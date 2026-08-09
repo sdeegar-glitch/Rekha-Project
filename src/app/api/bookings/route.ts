@@ -85,81 +85,90 @@ export async function POST(request: NextRequest) {
       patientEmail = user.email
     }
 
-    // Check for conflicting appointments
-    const existingAppointment = await db.appointment.findFirst({
-      where: {
-        patientId,
-        timeSlot: {
-          startTime: { lt: timeSlot.endTime },
-          endTime: { gt: timeSlot.startTime },
+    // Use Prisma Transaction to ensure atomic booking creation
+    const appointment = await db.$transaction(async (tx) => {
+      // 1. Mark time slot as booked (Optimistic Locking)
+      const updatedSlot = await tx.timeSlot.updateMany({
+        where: { id: validated.timeSlotId, status: SlotStatus.AVAILABLE },
+        data: { status: SlotStatus.BOOKED },
+      })
+
+      if (updatedSlot.count === 0) {
+        throw new Error('SLOT_UNAVAILABLE')
+      }
+
+      // 2. Check for conflicting appointments
+      const existingAppointment = await tx.appointment.findFirst({
+        where: {
+          patientId,
+          timeSlot: {
+            startTime: { lt: timeSlot.endTime },
+            endTime: { gt: timeSlot.startTime },
+          },
+          status: { in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
         },
-        status: { in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
-      },
-    })
+      })
 
-    if (existingAppointment) {
-      return NextResponse.json({ error: 'You already have an appointment at this time' }, { status: 409 })
-    }
+      if (existingAppointment) {
+        throw new Error('CONFLICT')
+      }
 
-    // Create appointment
-    const appointment = await db.appointment.create({
-      data: {
-        patientId,
-        adminId: timeSlot.availability.userId,
-        serviceId: validated.serviceId,
-        timeSlotId: validated.timeSlotId,
-        status: AppointmentStatus.PENDING,
-        reason: validated.reason,
-        notes: validated.notes,
-      },
-      include: {
-        service: true,
-        timeSlot: true,
-        patient: { select: { id: true, name: true, email: true, phone: true } },
-      },
-    })
-
-    // Mark time slot as booked
-    await db.timeSlot.update({
-      where: { id: validated.timeSlotId },
-      data: { status: SlotStatus.BOOKED },
-    })
-
-    // Create notification for patient
-    await db.notification.create({
-      data: {
-        userId: patientId,
-        type: 'APPOINTMENT_CREATED',
-        title: 'Appointment Requested',
-        message: `Your ${service.name} appointment has been requested for ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}. Awaiting confirmation.`,
-        data: { appointmentId: appointment.id },
-      },
-    })
-
-    // Create notification for admin
-    await db.notification.create({
-      data: {
-        userId: appointment.adminId!,
-        type: 'APPOINTMENT_CREATED',
-        title: 'New Appointment Request',
-        message: `${appointment.patient.name} requested ${service.name} for ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}.`,
-        data: { appointmentId: appointment.id, patientName: appointment.patient.name },
-      },
-    })
-
-    // Audit log
-    await db.auditLog.create({
-      data: {
-        userId: patientId,
-        action: 'APPOINTMENT_CREATED',
-        entity: 'Appointment',
-        entityId: appointment.id,
-        newData: {
-          serviceId: appointment.serviceId,
-          timeSlotId: appointment.timeSlotId,
-          status: appointment.status,
+      // 3. Create appointment
+      const newAppointment = await tx.appointment.create({
+        data: {
+          patientId,
+          adminId: timeSlot.availability.userId,
+          serviceId: validated.serviceId,
+          timeSlotId: validated.timeSlotId,
+          status: AppointmentStatus.PENDING,
+          reason: validated.reason,
+          notes: validated.notes,
         },
-      },
+        include: {
+          service: true,
+          timeSlot: true,
+          patient: { select: { id: true, name: true, email: true, phone: true } },
+        },
+      })
+
+      // 4. Create notification for patient
+      await tx.notification.create({
+        data: {
+          userId: patientId,
+          type: 'APPOINTMENT_CREATED',
+          title: 'Appointment Requested',
+          message: `Your ${service.name} appointment has been requested for ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}. Awaiting confirmation.`,
+          data: { appointmentId: newAppointment.id },
+        },
+      })
+
+      // 5. Create notification for admin
+      await tx.notification.create({
+        data: {
+          userId: newAppointment.adminId!,
+          type: 'APPOINTMENT_CREATED',
+          title: 'New Appointment Request',
+          message: `${newAppointment.patient.name} requested ${service.name} for ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}.`,
+          data: { appointmentId: newAppointment.id, patientName: newAppointment.patient.name },
+        },
+      })
+
+      // 6. Audit log
+      await tx.auditLog.create({
+        data: {
+          userId: patientId,
+          action: 'APPOINTMENT_CREATED',
+          entity: 'Appointment',
+          entityId: newAppointment.id,
+          newData: {
+            serviceId: newAppointment.serviceId,
+            timeSlotId: newAppointment.timeSlotId,
+            status: newAppointment.status,
+          },
+        },
+      })
+
+      return newAppointment
     })
 
     return NextResponse.json({
@@ -173,8 +182,16 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error creating booking:', error)
-    if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data' }, { status: 400 })
+    if (error instanceof Error) {
+      if (error.name === 'ZodError') {
+        return NextResponse.json({ error: 'Invalid request data' }, { status: 400 })
+      }
+      if (error.message === 'SLOT_UNAVAILABLE') {
+        return NextResponse.json({ error: 'Time slot is no longer available' }, { status: 409 })
+      }
+      if (error.message === 'CONFLICT') {
+        return NextResponse.json({ error: 'You already have an appointment at this time' }, { status: 409 })
+      }
     }
     return NextResponse.json(
       { error: 'Failed to create booking' },

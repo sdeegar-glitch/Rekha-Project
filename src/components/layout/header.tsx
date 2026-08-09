@@ -10,6 +10,58 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { getInitials } from '@/lib/utils'
+import { useNotifications } from '@/hooks/useSocket'
+import { formatDistanceToNow } from 'date-fns'
+
+function NotificationsDropdown() {
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80" align="end">
+        <div className="flex items-center justify-between px-4 py-2 border-b">
+          <p className="text-sm font-medium">Notifications</p>
+          {unreadCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => markAllAsRead()} className="text-xs text-muted-foreground h-auto p-0">
+              Mark all read
+            </Button>
+          )}
+        </div>
+        <div className="max-h-[300px] overflow-y-auto">
+          {notifications.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">No new notifications</div>
+          ) : (
+            notifications.map((notif: any) => (
+              <div 
+                key={notif.id || notif.notificationId} 
+                className={cn("p-4 border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors", !notif.read && "bg-muted/20")}
+                onClick={() => !notif.read && markAsRead(notif.id || notif.notificationId)}
+              >
+                <div className="flex justify-between items-start mb-1">
+                  <p className={cn("text-sm", !notif.read && "font-semibold")}>{notif.title}</p>
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">
+                    {notif.createdAt ? formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true }) : 'Just now'}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2">{notif.message}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export function Header() {
   const { data: session, status } = useSession()
@@ -64,7 +116,9 @@ export function Header() {
           {status === 'loading' ? (
             <div className="h-10 w-20 animate-pulse rounded-md bg-muted" />
           ) : session ? (
-            <DropdownMenu>
+            <>
+              <NotificationsDropdown />
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
@@ -121,6 +175,7 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </>
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/auth/signin">

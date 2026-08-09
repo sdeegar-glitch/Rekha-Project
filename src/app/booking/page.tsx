@@ -1,7 +1,7 @@
 // Booking Page - Multi-step booking flow
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -86,7 +86,7 @@ export default function BookingPage() {
   const [processingPayment, setProcessingPayment] = useState(false)
 
   // Real-time slot updates
-  const { isConnected } = useSocket({
+  const { isConnected, emitLockSlot, emitUnlockSlot } = useSocket({
     channels: bookingData.serviceId && selectedDate 
       ? [`slots:${bookingData.serviceId}:${format(selectedDate, 'yyyy-MM-dd')}`] 
       : [],
@@ -100,6 +100,16 @@ export default function BookingPage() {
         prev.map((s) => (s.id === data.slotId ? { ...s, status: 'AVAILABLE' } : s))
       )
     },
+    onSlotLocked: (data) => {
+      setAvailableSlots((prev) =>
+        prev.map((s) => (s.id === data.slotId ? { ...s, status: 'LOCKED', lockedBy: data.userId } : s))
+      )
+    },
+    onSlotUnlocked: (data) => {
+      setAvailableSlots((prev) =>
+        prev.map((s) => (s.id === data.slotId && s.status === 'LOCKED' ? { ...s, status: 'AVAILABLE' } : s))
+      )
+    }
   })
 
   // Fetch available slots when service or date changes
@@ -121,6 +131,29 @@ export default function BookingPage() {
       setLoadingSlots(false)
     }
   }
+
+  // Cleanup lock on unmount
+  useEffect(() => {
+    return () => {
+      if (bookingData.timeSlotId) {
+        emitUnlockSlot(bookingData.timeSlotId)
+      }
+    }
+  }, [bookingData.timeSlotId, emitUnlockSlot])
+
+  // Pre-fill patient info if logged in
+  useEffect(() => {
+    if (session?.user) {
+      setBookingData((prev) => ({
+        ...prev,
+        patientInfo: {
+          ...prev.patientInfo,
+          name: session.user.name || '',
+          email: session.user.email || '',
+        },
+      }))
+    }
+  }, [session])
 
   // Handle step navigation
   const goToStep = (step: BookingStep) => {
@@ -169,6 +202,7 @@ export default function BookingPage() {
 
   // Handle service selection
   const handleServiceSelect = (serviceId: string) => {
+    if (bookingData.timeSlotId) emitUnlockSlot(bookingData.timeSlotId)
     setBookingData((prev) => ({ ...prev, serviceId, date: null, timeSlotId: null }))
     setSelectedDate(null)
     setAvailableSlots([])
@@ -176,6 +210,7 @@ export default function BookingPage() {
 
   // Handle date selection
   const handleDateSelect = (date: Date) => {
+    if (bookingData.timeSlotId) emitUnlockSlot(bookingData.timeSlotId)
     setSelectedDate(date)
     setBookingData((prev) => ({ ...prev, date, timeSlotId: null }))
     fetchSlots()
@@ -183,7 +218,11 @@ export default function BookingPage() {
 
   // Handle time slot selection
   const handleSlotSelect = (slotId: string) => {
+    if (bookingData.timeSlotId && bookingData.timeSlotId !== slotId) {
+      emitUnlockSlot(bookingData.timeSlotId)
+    }
     setBookingData((prev) => ({ ...prev, timeSlotId: slotId }))
+    emitLockSlot(slotId)
   }
 
   // Initiate payment
@@ -468,7 +507,7 @@ export default function BookingPage() {
                           <button
                             key={slot.id}
                             onClick={() => handleSlotSelect(slot.id)}
-                            disabled={slot.status !== 'AVAILABLE'}
+                            disabled={slot.status !== 'AVAILABLE' && bookingData.timeSlotId !== slot.id}
                             className={cn(
                               'p-3 rounded-lg border-2 text-left transition-all',
                               bookingData.timeSlotId === slot.id
@@ -482,7 +521,11 @@ export default function BookingPage() {
                               {format(new Date(slot.startTime), 'h:mm a')} - {format(new Date(slot.endTime), 'h:mm a')}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              {slot.status === 'AVAILABLE' ? 'Available' : slot.status}
+                              {slot.status === 'AVAILABLE' 
+                                ? 'Available' 
+                                : slot.status === 'LOCKED'
+                                  ? (bookingData.timeSlotId === slot.id ? 'Selected (Locked 5m)' : 'Locked')
+                                  : slot.status}
                             </div>
                           </button>
                         ))}

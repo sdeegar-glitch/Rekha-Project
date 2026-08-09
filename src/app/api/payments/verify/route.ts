@@ -7,9 +7,6 @@ import { AppointmentStatus, PaymentStatus } from '@prisma/client'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
 
     const body = await request.json()
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body
@@ -38,8 +35,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Payment record not found' }, { status: 404 })
     }
 
-    // Ensure it belongs to the user or an admin
-    if (payment.patientId !== session.user.id && session.user.role !== 'ADMIN') {
+    // Ensure it belongs to the user or an admin, if logged in
+    if (session?.user && session.user.role !== 'ADMIN' && payment.patientId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
