@@ -346,21 +346,35 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
-    fetch('/api/notifications')
-      .then(res => res.json())
-      .then(data => {
-        if (data.notifications) {
-          setNotifications(data.notifications)
-          setUnreadCount(data.notifications.filter((n: any) => !n.read).length)
-        }
-      })
-      .catch(err => console.error('Error fetching notifications:', err))
+    const fetchNotifications = () => {
+      fetch('/api/notifications')
+        .then(res => res.json())
+        .then(data => {
+          if (data.notifications) {
+            setNotifications(data.notifications)
+            setUnreadCount(data.notifications.filter((n: any) => !n.read).length)
+          }
+        })
+        .catch(err => console.error('Error fetching notifications:', err))
+    }
+
+    // Initial fetch
+    fetchNotifications()
+
+    // Poll every 30 seconds as fallback to websockets
+    const intervalId = setInterval(fetchNotifications, 30000)
+
+    return () => clearInterval(intervalId)
   }, [])
 
   const { isConnected } = useSocket({
     channels: ['notifications'],
     onNotification: (data) => {
-      setNotifications((prev) => [data, ...prev])
+      setNotifications((prev) => {
+        // Prevent duplicates if polling just caught it
+        if (prev.find(n => n.id === data.id)) return prev
+        return [data, ...prev]
+      })
       setUnreadCount((prev) => prev + 1)
     }
   })
