@@ -91,7 +91,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2" aria-label="Rekha Patel Psychology - Home">
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand-50 border border-brand-200">
-              <Image src="/logo.png" alt="Rekha Patel Psychology Logo" width={40} height={40} className="object-cover" />
+              <Image src="/logo.png" alt="Rekha Patel Psychology Logo" width={40} height={40} className="object-cover" priority />
             </div>
             <span className="hidden font-display text-xl font-bold text-foreground sm:block">
               Rekha Patel Psychology
