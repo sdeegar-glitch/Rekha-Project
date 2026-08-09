@@ -2,6 +2,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 import { Menu, X, User, LogOut, Calendar, Settings, Bell } from 'lucide-react'
 import { useState } from 'react'
@@ -89,8 +90,8 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2" aria-label="Rekha Patel Psychology - Home">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600">
-              <span className="text-lg font-semibold text-white">RP</span>
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand-50 border border-brand-200">
+              <Image src="/logo.png" alt="Rekha Patel Psychology Logo" width={40} height={40} className="object-cover" />
             </div>
             <span className="hidden font-display text-xl font-bold text-foreground sm:block">
               Rekha Patel Psychology
