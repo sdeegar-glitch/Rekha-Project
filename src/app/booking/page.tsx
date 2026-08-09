@@ -660,7 +660,7 @@ export default function BookingPage() {
                         <Label htmlFor="ecName">Name</Label>
                         <Input
                           id="ecName"
-                          value={bookingData.patientInfo.emergencyContact.name}
+                          value={bookingData.patientInfo.emergencyContact?.name || ''}
                           onChange={(e) => handleEmergencyContactChange('name', e.target.value)}
                           placeholder="Emergency contact name"
                         />
@@ -670,7 +670,7 @@ export default function BookingPage() {
                         <Input
                           id="ecPhone"
                           type="tel"
-                          value={bookingData.patientInfo.emergencyContact.phone}
+                          value={bookingData.patientInfo.emergencyContact?.phone || ''}
                           onChange={(e) => handleEmergencyContactChange('phone', e.target.value)}
                           placeholder="+91 98765 43210"
                         />
@@ -678,7 +678,7 @@ export default function BookingPage() {
                       <div>
                         <Label htmlFor="ecRelationship">Relationship</Label>
                         <Select
-                          value={bookingData.patientInfo.emergencyContact.relationship}
+                          value={bookingData.patientInfo.emergencyContact?.relationship || ''}
                           onValueChange={(value) => handleEmergencyContactChange('relationship', value)}
                         >
                           <SelectTrigger>
