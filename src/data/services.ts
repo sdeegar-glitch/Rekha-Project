@@ -54,6 +54,34 @@ export const servicesData = [
     ],
     duration: '50 minutes',
     price: '₹2500'
+  },
+  {
+    slug: 'emdr',
+    title: 'Trauma Therapy (EMDR)',
+    shortDescription: 'EMDR for PTSD and trauma recovery.',
+    fullDescription: 'Eye Movement Desensitization and Reprocessing (EMDR) for PTSD, complex trauma, and adverse life experiences. A structured, evidence-based approach to trauma recovery.',
+    benefits: [
+      'PTSD & complex trauma recovery',
+      'Childhood trauma processing',
+      'Accident & medical trauma',
+      'Phobias & fears reduction'
+    ],
+    duration: '90 minutes',
+    price: '₹4000'
+  },
+  {
+    slug: 'online-consultation',
+    title: 'Online Consultation',
+    shortDescription: 'Secure video sessions for therapy and follow-ups.',
+    fullDescription: 'Secure video consultation for follow-ups, medication review, initial assessments, or ongoing therapy. We use a HIPAA-compliant platform with end-to-end encryption.',
+    benefits: [
+      'Convenient access from home',
+      'Secure & private video link',
+      'Initial assessments & follow-ups',
+      'Flexible scheduling'
+    ],
+    duration: '30 minutes',
+    price: '₹1500'
   }
 ];
 
