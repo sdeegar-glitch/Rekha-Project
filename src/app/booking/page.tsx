@@ -359,7 +359,12 @@ export default function BookingPage() {
       ...prev,
       patientInfo: {
         ...prev.patientInfo,
-        emergencyContact: { ...prev.patientInfo.emergencyContact, [field]: value },
+        emergencyContact: {
+          name: prev.patientInfo.emergencyContact?.name || '',
+          phone: prev.patientInfo.emergencyContact?.phone || '',
+          relationship: prev.patientInfo.emergencyContact?.relationship || '',
+          [field]: value,
+        },
       },
     }))
   }
