@@ -48,7 +48,7 @@ interface UseSocketOptions {
 
 export function useSocket(options: UseSocketOptions = {}) {
   const {
-    autoConnect = true,
+    autoConnect = false, // Disabled to prevent console errors
     channels = [],
     onAppointmentCreated,
     onAppointmentUpdated,
