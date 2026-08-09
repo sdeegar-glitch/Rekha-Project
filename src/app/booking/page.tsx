@@ -113,13 +113,14 @@ export default function BookingPage() {
   })
 
   // Fetch available slots when service or date changes
-  const fetchSlots = async () => {
-    if (!bookingData.serviceId || !selectedDate) return
+  const fetchSlots = async (dateToFetch?: Date) => {
+    const fetchDate = dateToFetch || selectedDate
+    if (!bookingData.serviceId || !fetchDate) return
 
     setLoadingSlots(true)
     try {
       const response = await fetch(
-        `/api/availability/slots?serviceId=${bookingData.serviceId}&date=${format(selectedDate, 'yyyy-MM-dd')}`
+        `/api/availability/slots?serviceId=${bookingData.serviceId}&date=${format(fetchDate, 'yyyy-MM-dd')}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -213,7 +214,7 @@ export default function BookingPage() {
     if (bookingData.timeSlotId) emitUnlockSlot(bookingData.timeSlotId)
     setSelectedDate(date)
     setBookingData((prev) => ({ ...prev, date, timeSlotId: null }))
-    fetchSlots()
+    fetchSlots(date)
   }
 
   // Handle time slot selection
@@ -235,10 +236,20 @@ export default function BookingPage() {
     setProcessingPayment(true)
     try {
       // 1. Create the appointment in the database (status PENDING)
+      const payload = { ...bookingData }
+      if (
+        payload.patientInfo?.emergencyContact && 
+        !payload.patientInfo.emergencyContact.name && 
+        !payload.patientInfo.emergencyContact.phone
+      ) {
+        // Strip out the empty emergency contact object to prevent validation errors
+        delete payload.patientInfo.emergencyContact
+      }
+
       const bookingResponse = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify(payload),
       })
       
       if (!bookingResponse.ok) throw new Error('Failed to create booking')
@@ -519,23 +530,36 @@ export default function BookingPage() {
                             onClick={() => handleSlotSelect(slot.id)}
                             disabled={slot.status !== 'AVAILABLE' && bookingData.timeSlotId !== slot.id}
                             className={cn(
-                              'p-3 rounded-lg border-2 text-left transition-all',
+                              'p-3 rounded-lg border-2 text-left transition-all relative overflow-hidden',
                               bookingData.timeSlotId === slot.id
-                                ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/20'
+                                ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/40 shadow-sm ring-2 ring-brand-500/20'
                                 : slot.status === 'AVAILABLE'
-                                ? 'border-border hover:border-brand-300'
-                                : 'border-muted bg-muted/50 text-muted-foreground cursor-not-allowed'
+                                ? 'border-green-200 bg-green-50/50 hover:bg-green-50 hover:border-green-400 dark:border-green-900/50 dark:bg-green-900/10 dark:hover:bg-green-900/20 dark:hover:border-green-700'
+                                : 'border-red-100 bg-red-50/30 text-red-400 cursor-not-allowed opacity-60 dark:border-red-900/30 dark:bg-red-900/10'
                             )}
                           >
-                            <div className="font-medium">
+                            <div className={cn(
+                              "font-semibold text-lg",
+                              slot.status === 'AVAILABLE' ? 'text-green-700 dark:text-green-400' : 'text-red-700/70 dark:text-red-400/70',
+                              bookingData.timeSlotId === slot.id && 'text-brand-700 dark:text-brand-300'
+                            )}>
                               {format(new Date(slot.startTime), 'h:mm a')} - {format(new Date(slot.endTime), 'h:mm a')}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className={cn(
+                              "text-sm font-medium mt-1 flex items-center gap-1.5",
+                              slot.status === 'AVAILABLE' ? 'text-green-600 dark:text-green-500' : 'text-red-600/70 dark:text-red-500/70',
+                              bookingData.timeSlotId === slot.id && 'text-brand-600 dark:text-brand-400'
+                            )}>
+                              <div className={cn(
+                                "h-1.5 w-1.5 rounded-full",
+                                slot.status === 'AVAILABLE' ? 'bg-green-500' : 'bg-red-500',
+                                bookingData.timeSlotId === slot.id && 'bg-brand-500 animate-pulse'
+                              )} />
                               {slot.status === 'AVAILABLE' 
-                                ? 'Available' 
+                                ? 'Available to Book' 
                                 : slot.status === 'LOCKED'
-                                  ? (bookingData.timeSlotId === slot.id ? 'Selected (Locked 5m)' : 'Locked')
-                                  : slot.status}
+                                  ? (bookingData.timeSlotId === slot.id ? 'Selected (Locked 5m)' : 'Currently Locked')
+                                  : 'Not Available'}
                             </div>
                           </button>
                         ))}
