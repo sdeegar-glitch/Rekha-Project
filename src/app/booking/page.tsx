@@ -265,6 +265,16 @@ export default function BookingPage() {
       if (!orderResponse.ok) throw new Error('Failed to create payment order')
       const orderData = await orderResponse.json()
 
+      // Load Razorpay script dynamically
+      const { loadScript } = await import('@/lib/loadScript')
+      const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js')
+      
+      if (!res) {
+        toast({ title: 'Error', description: 'Razorpay SDK failed to load. Are you offline?', variant: 'destructive' })
+        setProcessingPayment(false)
+        return
+      }
+
       // 3. Open Razorpay checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_xxxxxx', // Replace with your key
