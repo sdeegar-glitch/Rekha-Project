@@ -40,7 +40,7 @@ interface BookingData {
     phone: string
     dateOfBirth: string
     address: string
-    emergencyContact: {
+    emergencyContact?: {
       name: string
       phone: string
       relationship: string
