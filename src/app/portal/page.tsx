@@ -42,7 +42,7 @@ export default async function PortalPage() {
   }
 
   const AppointmentCard = ({ appointment, isUpcoming }: { appointment: any, isUpcoming: boolean }) => (
-    <Card className={elative overflow-hidden transition-all \}>
+    <Card className={`relative overflow-hidden transition-all ${isUpcoming ? 'border-brand-200 shadow-sm hover:shadow-md' : 'border-muted bg-muted/20 opacity-80'}`}>
       {isUpcoming && <div className="absolute top-0 left-0 w-1 h-full bg-brand-500" />}
       <CardHeader className="pb-3 flex flex-row items-start justify-between">
         <div>

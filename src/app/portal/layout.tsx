@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { PortalSidebar } from '@/components/layout/portal-sidebar'
-import { SidebarProvider } from '@/components/ui/sidebar'
 
 export const metadata = {
   title: 'Patient Portal - Rekha Patel Psychology',
@@ -20,13 +19,11 @@ export default async function PortalLayout({
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-muted/20">
-        <PortalSidebar />
-        <main className="flex-1 overflow-y-auto w-full">
-          {children}
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="flex min-h-screen w-full bg-muted/20">
+      <PortalSidebar />
+      <main className="flex-1 overflow-y-auto w-full">
+        {children}
+      </main>
+    </div>
   )
 }
