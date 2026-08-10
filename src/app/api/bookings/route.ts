@@ -184,7 +184,8 @@ export async function POST(request: NextRequest) {
     console.error('Error creating booking:', error)
     if (error instanceof Error) {
       if (error.name === 'ZodError') {
-        return NextResponse.json({ error: 'Invalid request data' }, { status: 400 })
+        console.error('Zod Validation Error:', (error as any).issues)
+        return NextResponse.json({ error: 'Invalid request data', issues: (error as any).issues }, { status: 400 })
       }
       if (error.message === 'SLOT_UNAVAILABLE') {
         return NextResponse.json({ error: 'Time slot is no longer available' }, { status: 409 })

@@ -110,7 +110,7 @@ export const serviceUpdateSchema = serviceCreateSchema.partial()
 
 // Appointment schemas
 export const appointmentCreateSchema = z.object({
-  serviceId: idSchema,
+  serviceId: z.string(),
   timeSlotId: idSchema,
   reason: z.string().max(1000).optional(),
   notes: z.string().max(2000).optional(),
