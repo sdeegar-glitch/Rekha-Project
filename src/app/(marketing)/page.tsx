@@ -11,7 +11,7 @@ export default function HomePage() {
     {
       icon: Shield,
       title: 'Licensed Professional',
-      description: 'Dr. Rekha Patel is a licensed clinical psychologist with 15+ years of experience.',
+      description: 'Rekha Patel is a licensed clinical psychologist with 7+ years of experience.',
     },
     {
       icon: Heart,
@@ -41,27 +41,27 @@ export default function HomePage() {
   ]
 
   const stats = [
-    { value: '15+', label: 'Years Experience' },
-    { value: '2000+', label: 'Patients Helped' },
-    { value: '6', label: 'Specializations' },
-    { value: '4.9', label: 'Patient Rating' },
+    { value: '7+', label: 'Years Experience' },
+    { value: '3', label: 'Age Groups Served' },
+    { value: '6', label: 'Therapy Services Offered' },
+    { value: '5', label: 'Disorders Treated' },
   ]
 
   const testimonials = [
     {
-      quote: "Dr. Patel's approach to CBT completely transformed how I handle anxiety. I feel equipped with tools I'll use for life.",
+      quote: "Rekha Patel's approach to CBT completely transformed how I handle anxiety. I feel equipped with tools I'll use for life.",
       author: 'Sarah M.',
       role: 'Software Engineer',
       rating: 5,
     },
     {
-      quote: 'The couples therapy sessions saved our marriage. Dr. Patel created a safe space for us to communicate honestly.',
+      quote: 'The couples therapy sessions saved our marriage. Rekha Patel created a safe space for us to communicate honestly.',
       author: 'Raj & Priya K.',
       role: 'Married 12 years',
       rating: 5,
     },
     {
-      quote: 'EMDR therapy with Dr. Patel helped me process trauma I\'d carried for decades. I finally feel free.',
+      quote: 'EMDR therapy with Rekha Patel helped me process trauma I\'d carried for decades. I finally feel free.',
       author: 'Anonymous',
       role: 'Trauma Survivor',
       rating: 5,
@@ -87,9 +87,9 @@ export default function HomePage() {
               for Your Wellbeing
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto animate-in">
-              Dr. Rekha Patel provides evidence-based therapy for anxiety, depression, trauma, 
-              and relationship challenges. Book your appointment online with secure payments and 
-              real-time availability.
+              Rekha Patel provides evidence-based assessment and therapy for depression, anxiety
+              disorders, personality disorders, and other psychiatric conditions. Book your
+              appointment online with secure payments and real-time availability.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row animate-in">
               <Link href="/booking">
@@ -203,7 +203,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 id="features-heading" className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Why Choose Dr. Rekha Patel
+              Why Choose Rekha Patel
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               Experience, expertise, and empathy combined for your healing journey

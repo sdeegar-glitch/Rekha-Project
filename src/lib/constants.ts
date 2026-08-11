@@ -194,23 +194,20 @@ export const clinicInfo = {
     sunday: { closed: true },
   },
   timezone: 'Asia/Kolkata',
-  licenseNumber: 'RCI/CRR/12345',
   qualifications: [
-    'M.Phil Clinical Psychology (NIMHANS)',
-    'Ph.D. Psychology (University of Mumbai)',
-    'Certified EMDR Therapist (EMDRIA)',
-    'Certified CBT Therapist (Beck Institute)',
-    'Gottman Method Level 3 Certified',
+    'M.Phil in Clinical Psychology, Central Institute of Psychiatry (CIP), Ranchi (2016)',
+    'Post Graduate Diploma in Guidance, Counselling and Psychological Intervention, Banaras Hindu University (BHU) (2013)',
+    'MA in Psychology, Banaras Hindu University (BHU) (2012)',
+    'Trained in Cognitive Behaviour Therapy for depression, anxiety, and suicide prevention, Beck Institute for CBT',
   ],
   specializations: [
-    'Anxiety Disorders',
-    'Depression & Mood Disorders',
-    'Trauma & PTSD',
-    'Relationship Issues',
-    'OCD & Related Disorders',
+    'Depression',
+    'Anxiety Disorders (Panic Attacks, Phobias, OCD)',
+    'Personality Disorders',
+    'Schizophrenia',
+    'Bipolar Disorder',
     'Stress Management',
   ],
-  languages: ['English', 'Hindi', 'Marathi', 'Gujarati'],
 }
 
 // Payment Configuration
@@ -239,7 +236,7 @@ export const notificationTemplates = {
       subject: 'Reminder: Your appointment tomorrow at {time}',
       template: 'appointment-reminder-email',
     },
-    sms: 'Reminder: {serviceName} tomorrow at {time} with Dr. Rekha Patel. Reply STOP to opt out.',
+    sms: 'Reminder: {serviceName} tomorrow at {time} with Rekha Patel. Reply STOP to opt out.',
     push: 'Appointment tomorrow at {time}',
   },
   appointmentCancelled: {
@@ -271,7 +268,7 @@ export const notificationTemplates = {
 // SEO Configuration
 export const seoConfig = {
   defaultTitle: 'Rekha Patel Psychology | Clinical Psychologist',
-  defaultDescription: 'Dr. Rekha Patel - Clinical Psychologist specializing in anxiety, depression, trauma, and relationship counseling. Book online appointments with secure payments.',
+  defaultDescription: 'Rekha Patel - Clinical Psychologist specializing in depression, anxiety disorders (panic attacks, phobias, OCD), personality disorders, schizophrenia, and bipolar disorder. Book online appointments with secure payments.',
   defaultImage: '/og-image.jpg',
   siteUrl: 'https://rekhapatel.com',
   twitterHandle: '@rekhapatelpsych',

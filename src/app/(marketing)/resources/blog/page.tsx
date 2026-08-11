@@ -2,7 +2,7 @@ import { BookOpen } from 'lucide-react'
 
 export const metadata = {
   title: 'Blog & Resources | Rekha Patel Psychology',
-  description: 'Read the latest articles, mental health tips, and psychological insights from Dr. Rekha Patel.',
+  description: 'Read the latest articles, mental health tips, and psychological insights from Rekha Patel.',
 }
 
 export default function BlogPage() {
@@ -16,7 +16,7 @@ export default function BlogPage() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-brand-900 mb-4">Psychology Blog</h1>
           <p className="text-lg text-brand-700 max-w-2xl mb-8">
-            Our blog is currently under construction. Check back soon for insightful articles, mental health tips, and updates from Dr. Rekha Patel.
+            Our blog is currently under construction. Check back soon for insightful articles, mental health tips, and updates from Rekha Patel.
           </p>
         </div>
 

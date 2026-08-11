@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     default: 'Rekha Patel Psychology | Clinical Psychologist',
     template: '%s | Rekha Patel Psychology',
   },
-  description: 'Dr. Rekha Patel - Clinical Psychologist specializing in anxiety, depression, trauma, and relationship counseling. Book online appointments with secure payments.',
-  keywords: ['clinical psychologist', 'therapy', 'counseling', 'mental health', 'anxiety', 'depression', 'trauma', 'CBT', 'EMDR', 'online therapy'],
+  description: 'Rekha Patel - Clinical Psychologist specializing in depression, anxiety disorders (panic attacks, phobias, OCD), personality disorders, schizophrenia, and bipolar disorder. Book online appointments with secure payments.',
+  keywords: ['clinical psychologist', 'therapy', 'counseling', 'mental health', 'anxiety', 'depression', 'personality disorders', 'schizophrenia', 'bipolar disorder', 'CBT', 'online therapy'],
   authors: [{ name: 'Rekha Patel Psychology' }],
   creator: 'Rekha Patel Psychology',
   publisher: 'Rekha Patel Psychology',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     url: 'https://rekhapatel.com',
     siteName: 'Rekha Patel Psychology',
     title: 'Rekha Patel Psychology | Clinical Psychologist',
-    description: 'Dr. Rekha Patel - Clinical Psychologist specializing in anxiety, depression, trauma, and relationship counseling.',
+    description: 'Rekha Patel - Clinical Psychologist specializing in depression, anxiety disorders, personality disorders, schizophrenia, and bipolar disorder.',
     images: [
       {
         url: '/og-image.jpg',

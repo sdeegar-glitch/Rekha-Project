@@ -62,7 +62,7 @@ export default async function PortalPage() {
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <User className="h-4 w-4" />
-            <span>Dr. Rekha Patel</span>
+            <span>Rekha Patel</span>
           </div>
         </div>
       </CardContent>

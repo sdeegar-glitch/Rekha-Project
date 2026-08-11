@@ -7,7 +7,7 @@ export function Footer() {
   const footerLinks = {
     quickLinks: [
       { href: '/', label: 'Home' },
-      { href: '/about', label: 'About Dr. Patel' },
+      { href: '/about', label: 'About Rekha Patel' },
       { href: '/services', label: 'Services' },
       { href: '/booking', label: 'Book Appointment' },
       { href: '/contact', label: 'Contact' },
@@ -58,7 +58,8 @@ export function Footer() {
             </Link>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               Providing compassionate, evidence-based psychological care to help you thrive.
-              Dr. Rekha Patel specializes in anxiety, depression, trauma, and relationship counseling.
+              Rekha Patel specializes in depression, anxiety disorders, personality disorders,
+              schizophrenia, and bipolar disorder.
             </p>
             <div className="mt-6 flex gap-4">
               {socialLinks.map((social) => (

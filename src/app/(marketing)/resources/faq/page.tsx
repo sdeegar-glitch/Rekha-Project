@@ -7,7 +7,7 @@ import {
 
 export const metadata = {
   title: 'Frequently Asked Questions | Rekha Patel Psychology',
-  description: 'Find answers to common questions about therapy, confidentiality, fees, and what to expect in your first session with Dr. Rekha Patel.',
+  description: 'Find answers to common questions about therapy, confidentiality, fees, and what to expect in your first session with Rekha Patel.',
 }
 
 export default function FAQPage() {

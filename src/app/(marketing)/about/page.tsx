@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export const metadata = {
   title: 'About Us | Rekha Patel Psychology',
-  description: 'Learn about Dr. Rekha Patel, our clinic\'s philosophy, and our commitment to providing compassionate, evidence-based psychological care.',
+  description: 'Learn about Rekha Patel, our clinic\'s philosophy, and our commitment to providing compassionate, evidence-based psychological care.',
 }
 
 export default function AboutPage() {
@@ -27,11 +27,11 @@ export default function AboutPage() {
   ]
 
   const credentials = [
-    'Ph.D. in Clinical Psychology',
-    'Licensed Clinical Psychologist',
-    'Certified CBT Practitioner',
-    '15+ Years of Clinical Experience',
-    'Member of the Psychological Association',
+    'M.Phil in Clinical Psychology, Central Institute of Psychiatry (CIP), Ranchi (2016)',
+    'Post Graduate Diploma in Guidance, Counselling & Psychological Intervention, BHU (2013)',
+    'MA in Psychology, Banaras Hindu University (2012)',
+    'Trained in CBT for depression, anxiety & suicide prevention, Beck Institute for CBT',
+    '7+ Years of Clinical Experience across Adolescents, Adults & Geriatrics',
   ]
 
   return (
@@ -52,9 +52,12 @@ export default function AboutPage() {
                 Empowering your journey to mental wellness
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Led by Dr. Rekha Patel, our clinic is dedicated to providing compassionate, 
-                evidence-based psychological services to help you navigate life&apos;s challenges
-                and build a fulfilling future.
+                Rekha Patel is a licensed clinical psychologist trained at the Central Institute
+                of Psychiatry (CIP), Ranchi, with over 7 years of clinical experience across
+                adolescents, adults, and geriatrics. She has worked as a clinical psychologist
+                and researcher on global health projects at AIIMS, New Delhi, and specializes in
+                assessment and therapy for depression, anxiety disorders, personality disorders,
+                schizophrenia, and bipolar disorder.
               </p>
               <div className="pt-4 flex flex-col sm:flex-row gap-4">
                 <Link href="/booking">
@@ -71,7 +74,7 @@ export default function AboutPage() {
                 <div className="absolute inset-0 bg-linear-to-br from-brand-200 via-brand-100 to-sage-100 flex items-center justify-center">
                   <div className="text-center p-8">
                     <GraduationCap className="w-20 h-20 text-brand-600 mx-auto mb-4 opacity-50" />
-                    <p className="text-brand-800 font-display text-xl font-medium">Dr. Rekha Patel</p>
+                    <p className="text-brand-800 font-display text-xl font-medium">Rekha Patel</p>
                   </div>
                 </div>
               </div>
@@ -83,7 +86,7 @@ export default function AboutPage() {
                     <Award className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">15+</p>
+                    <p className="text-2xl font-bold text-foreground">7+</p>
                     <p className="text-sm font-medium text-muted-foreground">Years Experience</p>
                   </div>
                 </div>
@@ -131,8 +134,9 @@ export default function AboutPage() {
               <div className="text-white">
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">Professional Credentials</h2>
                 <p className="text-brand-100 text-lg mb-8 leading-relaxed">
-                  Dr. Patel is a highly qualified clinical psychologist committed to continuous professional development 
-                  and upholding the highest standards of clinical practice.
+                  Rekha has expertise in conducting psychological assessments and providing
+                  therapy for a range of psychiatric disorders, and dealing with stressful
+                  life situations.
                 </p>
                 <Link href="/services">
                   <Button variant="outline" className="rounded-full border-white text-white hover:bg-white/10 bg-transparent h-12 px-8">

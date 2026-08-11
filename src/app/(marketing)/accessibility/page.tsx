@@ -2,7 +2,7 @@ export default function AccessibilityPage() {
   return (
     <div className="container mx-auto py-24 px-4 max-w-4xl">
       <h1 className="text-4xl font-bold mb-8">Accessibility Statement</h1>
-      <p className="mb-4 text-muted-foreground">At Dr. Rekha Patel Psychology, we are committed to ensuring digital accessibility for people with disabilities.</p>
+      <p className="mb-4 text-muted-foreground">At Rekha Patel Psychology, we are committed to ensuring digital accessibility for people with disabilities.</p>
       
       <section className="mb-8 space-y-4 text-muted-foreground">
         <h2 className="text-2xl font-semibold text-foreground">1. Conformance Status</h2>

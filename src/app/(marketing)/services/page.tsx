@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export const metadata = {
   title: 'Our Services | Rekha Patel Psychology',
-  description: 'Explore the comprehensive psychological services offered by Dr. Rekha Patel, including Individual Therapy, CBT, EMDR, and more.',
+  description: 'Explore the comprehensive psychological services offered by Rekha Patel, including Individual Therapy, CBT, EMDR, and more.',
 }
 
 export default function ServicesPage() {

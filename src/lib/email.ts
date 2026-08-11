@@ -49,7 +49,7 @@ export async function sendAppointmentConfirmation(patientEmail: string, patientN
     <br/>
     <p>If you need to reschedule or cancel, please log in to your account.</p>
     <p>Best regards,</p>
-    <p>Dr. Rekha Patel</p>
+    <p>Rekha Patel</p>
   `
   return sendEmail({ to: patientEmail, subject: 'Your Appointment is Confirmed', html })
 }
