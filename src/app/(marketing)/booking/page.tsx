@@ -18,7 +18,6 @@ import { format, parse, subYears, addDays, startOfMonth, endOfMonth, eachDayOfIn
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/hooks/use-toast'
 import { services } from '@/lib/constants'
-import { useSocket } from '@/hooks/useSocket'
 
 type BookingStep = 'service' | 'datetime' | 'details' | 'payment' | 'confirmation'
 
@@ -94,33 +93,6 @@ export default function BookingPage() {
   const [processingPayment, setProcessingPayment] = useState(false)
   const [dobPickerOpen, setDobPickerOpen] = useState(false)
 
-  // Real-time slot updates
-  const { isConnected, emitLockSlot, emitUnlockSlot } = useSocket({
-    channels: bookingData.serviceId && selectedDate 
-      ? [`slots:${bookingData.serviceId}:${format(selectedDate, 'yyyy-MM-dd')}`] 
-      : [],
-    onSlotBooked: (data) => {
-      setAvailableSlots((prev) =>
-        prev.map((s) => (s.id === data.slotId ? { ...s, status: 'BOOKED' } : s))
-      )
-    },
-    onSlotAvailable: (data) => {
-      setAvailableSlots((prev) =>
-        prev.map((s) => (s.id === data.slotId ? { ...s, status: 'AVAILABLE' } : s))
-      )
-    },
-    onSlotLocked: (data) => {
-      setAvailableSlots((prev) =>
-        prev.map((s) => (s.id === data.slotId ? { ...s, status: 'LOCKED', lockedBy: data.userId } : s))
-      )
-    },
-    onSlotUnlocked: (data) => {
-      setAvailableSlots((prev) =>
-        prev.map((s) => (s.id === data.slotId && s.status === 'LOCKED' ? { ...s, status: 'AVAILABLE' } : s))
-      )
-    }
-  })
-
   // Fetch available slots when service or date changes
   const fetchSlots = async (dateToFetch?: Date) => {
     const fetchDate = dateToFetch || selectedDate
@@ -144,15 +116,6 @@ export default function BookingPage() {
       setLoadingSlots(false)
     }
   }
-
-  // Cleanup lock on unmount
-  useEffect(() => {
-    return () => {
-      if (bookingData.timeSlotId) {
-        emitUnlockSlot(bookingData.timeSlotId)
-      }
-    }
-  }, [bookingData.timeSlotId, emitUnlockSlot])
 
   // Pre-fill patient info if logged in. This intentionally seeds editable
   // form state from the session rather than deriving it during render, since
@@ -220,7 +183,6 @@ export default function BookingPage() {
 
   // Handle service selection
   const handleServiceSelect = (serviceId: string) => {
-    if (bookingData.timeSlotId) emitUnlockSlot(bookingData.timeSlotId)
     setBookingData((prev) => ({ ...prev, serviceId, date: null, timeSlotId: null }))
     setSelectedDate(null)
     setAvailableSlots([])
@@ -228,7 +190,6 @@ export default function BookingPage() {
 
   // Handle date selection
   const handleDateSelect = (date: Date) => {
-    if (bookingData.timeSlotId) emitUnlockSlot(bookingData.timeSlotId)
     setSelectedDate(date)
     setBookingData((prev) => ({ ...prev, date, timeSlotId: null }))
     fetchSlots(date)
@@ -236,11 +197,7 @@ export default function BookingPage() {
 
   // Handle time slot selection
   const handleSlotSelect = (slotId: string) => {
-    if (bookingData.timeSlotId && bookingData.timeSlotId !== slotId) {
-      emitUnlockSlot(bookingData.timeSlotId)
-    }
     setBookingData((prev) => ({ ...prev, timeSlotId: slotId }))
-    emitLockSlot(slotId)
   }
 
   // Initiate payment
@@ -275,8 +232,23 @@ export default function BookingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      
-      if (!bookingResponse.ok) throw new Error('Failed to create booking')
+
+      if (!bookingResponse.ok) {
+        if (bookingResponse.status === 409) {
+          const errorData = await bookingResponse.json().catch(() => null)
+          toast({
+            title: 'Slot no longer available',
+            description: errorData?.error || 'Someone else just booked this time. Please choose another slot.',
+            variant: 'destructive',
+          })
+          setBookingData((prev) => ({ ...prev, timeSlotId: null }))
+          setCurrentStep('datetime')
+          if (selectedDate) fetchSlots(selectedDate)
+          setProcessingPayment(false)
+          return
+        }
+        throw new Error('Failed to create booking')
+      }
       const bookingResult = await bookingResponse.json()
       const appointmentId = bookingResult.appointment.id
 
@@ -592,14 +564,6 @@ export default function BookingPage() {
                               )}
                             >
                               {format(new Date(slot.startTime), 'h:mm a')}
-                              {isSelected && (
-                                <span className="block text-[11px] font-normal text-primary-foreground/80 mt-0.5">
-                                  Held for 5 min
-                                </span>
-                              )}
-                              {slot.status === 'LOCKED' && !isSelected && (
-                                <span className="block text-[11px] font-normal mt-0.5">Held by another</span>
-                              )}
                             </button>
                           )
                         })}
@@ -1046,12 +1010,6 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* Connection Status */}
-        {!isConnected && (
-          <div className="mt-4 p-3 text-center text-sm text-amber-700 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-            ⚠️ Real-time updates unavailable. Please refresh to see latest availability.
-          </div>
-        )}
       </div>
     </div>
   )
