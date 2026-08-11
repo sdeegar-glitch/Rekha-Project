@@ -13,11 +13,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing x-razorpay-signature header' }, { status: 400 })
   }
 
+  if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+    console.error('RAZORPAY_WEBHOOK_SECRET is not configured; rejecting webhook')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+  }
+
   try {
     const isValid = verifyWebhookSignature(
       body,
       signature,
-      process.env.RAZORPAY_WEBHOOK_SECRET!
+      process.env.RAZORPAY_WEBHOOK_SECRET
     )
 
     if (!isValid) {

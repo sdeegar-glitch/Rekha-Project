@@ -285,10 +285,20 @@ export default function BookingPage() {
       if (!orderResponse.ok) throw new Error('Failed to create payment order')
       const orderData = await orderResponse.json()
 
+      if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+        toast({
+          title: 'Payments unavailable',
+          description: 'Online payment is not configured yet. Please contact us to complete your booking.',
+          variant: 'destructive',
+        })
+        setProcessingPayment(false)
+        return
+      }
+
       // Load Razorpay script dynamically
       const { loadScript } = await import('@/lib/loadScript')
       const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js')
-      
+
       if (!res) {
         toast({ title: 'Error', description: 'Razorpay SDK failed to load. Are you offline?', variant: 'destructive' })
         setProcessingPayment(false)
@@ -297,7 +307,7 @@ export default function BookingPage() {
 
       // 3. Open Razorpay checkout
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_xxxxxx', // Replace with your key
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Rekha Patel Psychology',
@@ -312,7 +322,7 @@ export default function BookingPage() {
           contact: bookingData.patientInfo.phone,
         },
         theme: {
-          color: '#3B82F6', // brand-600
+          color: '#392f79', // --primary
         },
       }
 
