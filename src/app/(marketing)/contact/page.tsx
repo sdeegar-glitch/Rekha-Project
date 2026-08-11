@@ -42,13 +42,13 @@ export default function ContactPage() {
   const contactInfo = [
     {
       title: 'Visit Us',
-      details: '123 Wellness Avenue, Suite 200, Metropolis, NY 10001',
+      details: '12 MG Road, 3rd Floor, Bengaluru, Karnataka 560001',
       icon: MapPin,
       color: 'bg-brand-100 text-brand-600',
     },
     {
       title: 'Call Us',
-      details: '+1 (555) 123-4567',
+      details: '+91 98765 43210',
       icon: Phone,
       color: 'bg-sage-100 text-sage-600',
     },

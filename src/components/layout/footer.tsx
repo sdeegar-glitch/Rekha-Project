@@ -31,8 +31,8 @@ export function Footer() {
   }
 
   const contactInfo = {
-    address: '123 Wellness Avenue, Suite 200, Metropolis, NY 10001',
-    phone: '+1 (555) 123-4567',
+    address: '12 MG Road, 3rd Floor, Bengaluru, Karnataka 560001',
+    phone: '+91 98765 43210',
     email: 'hello@rekhapatelpsychology.com',
     hours: 'Mon-Fri: 9:00 AM - 6:00 PM\nSat: 10:00 AM - 2:00 PM\nSun: Closed',
   }
