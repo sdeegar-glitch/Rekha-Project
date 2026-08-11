@@ -41,6 +41,13 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  --color-sidebar: hsl(var(--card));
+  --color-sidebar-foreground: hsl(var(--card-foreground));
+  --color-sidebar-accent: hsl(var(--muted));
+  --color-sidebar-accent-foreground: hsl(var(--primary));
+  --color-sidebar-ring: hsl(var(--ring));
+  --color-sidebar-border: hsl(var(--border));
+
   /* Ink — the single confident accent (deep indigo-violet), used sparingly */
   --color-brand-50: #f2f1fc;
   --color-brand-100: #e4e2f9;

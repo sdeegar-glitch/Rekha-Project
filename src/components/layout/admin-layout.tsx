@@ -16,6 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  Menu,
+  X,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
@@ -31,76 +33,115 @@ const navigation = [
   { name: 'Patients', href: '/admin/patients', icon: Users },
 ]
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  mobileOpen: boolean
+  onMobileClose: () => void
+}
+
+export function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebarProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
 
-  return (
-    <Sidebar className={cn('h-screen border-r', collapsed && 'w-16')}>
-      <SidebarContent>
+  const content = (
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel className={cn('px-4', collapsed && 'hidden')}>Navigation</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {navigation.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton
+                  asChild
+                  className={cn(
+                    'gap-3',
+                    collapsed && 'justify-center px-2'
+                  )}
+                  isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
+                >
+                  <Link href={item.href} onClick={onMobileClose}>
+                    <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    <span className={cn('truncate', collapsed && 'hidden')}>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+
+      <SidebarFooter>
         <SidebarGroup>
-          <SidebarGroupLabel className={cn('px-4', collapsed && 'hidden')}>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigation.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      'gap-3',
-                      collapsed && 'justify-center px-2'
-                    )}
-                    isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
-                  >
-                    <Link href={item.href}>
-                      <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                      <span className={cn('truncate', collapsed && 'hidden')}>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className="gap-3 justify-center px-2 hidden md:flex"
+                  onClick={() => setCollapsed(!collapsed)}
+                  aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                >
+                  {collapsed ? (
+                    <ChevronRight className="h-5 w-5" />
+                  ) : (
+                    <>
+                      <ChevronLeft className="h-5 w-5 shrink-0" />
+                      <span>Collapse</span>
+                    </>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+      </SidebarFooter>
+    </SidebarContent>
+  )
 
-        <SidebarFooter>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    className="gap-3 justify-center px-2"
-                    onClick={() => setCollapsed(!collapsed)}
-                    aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                  >
-                    {collapsed ? (
-                      <ChevronRight className="h-5 w-5" />
-                    ) : (
-                      <>
-                        <ChevronLeft className="h-5 w-5 shrink-0" />
-                        <span>Collapse</span>
-                      </>
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarFooter>
-      </SidebarContent>
-    </Sidebar>
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <Sidebar className={cn('h-screen border-r hidden md:flex', collapsed && 'w-16')}>
+        {content}
+      </Sidebar>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={onMobileClose}
+            aria-hidden="true"
+          />
+          <Sidebar className="relative h-screen w-72 border-r z-50">
+            <div className="flex items-center justify-between p-4 border-b">
+              <span className="font-semibold">{session?.user?.name || 'Admin'}</span>
+              <Button variant="ghost" size="icon" onClick={onMobileClose} aria-label="Close menu">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            {content}
+          </Sidebar>
+        </div>
+      )}
+    </>
   )
 }
 
-export function AdminHeader() {
+interface AdminHeaderProps {
+  onMenuClick: () => void
+}
+
+export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const { data: session } = useSession()
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 px-4 sm:px-6">
+      <Button variant="ghost" size="icon" className="md:hidden" onClick={onMenuClick} aria-label="Open menu">
+        <Menu className="h-5 w-5" />
+      </Button>
       <h1 className="text-xl font-semibold">Admin Dashboard</h1>
       <div className="flex-1" />
-      
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -132,11 +173,13 @@ export function AdminHeader() {
 }
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
   return (
     <div className="flex h-screen bg-background">
-      <AdminSidebar />
+      <AdminSidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminHeader />
+        <AdminHeader onMenuClick={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
