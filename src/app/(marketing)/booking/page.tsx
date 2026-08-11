@@ -125,6 +125,9 @@ export default function BookingPage() {
       if (response.ok) {
         const data = await response.json()
         setAvailableSlots(data.slots || [])
+      } else {
+        setAvailableSlots([])
+        toast({ title: 'Error', description: 'Failed to load available slots', variant: 'destructive' })
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load available slots', variant: 'destructive' })

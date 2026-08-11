@@ -69,7 +69,11 @@ export async function GET(request: NextRequest) {
         payment: { select: { id: true, amount: true, currency: true, status: true, method: true } },
         admin: { select: { id: true, name: true, email: true } },
       },
-      orderBy: filters.sortBy ? ({ [filters.sortBy]: filters.sortOrder } as any) : { createdAt: 'desc' },
+      orderBy: filters.sortBy === 'startTime'
+        ? { timeSlot: { startTime: filters.sortOrder } }
+        : filters.sortBy
+          ? ({ [filters.sortBy]: filters.sortOrder } as any)
+          : { createdAt: 'desc' },
       skip: (filters.page - 1) * filters.pageSize,
       take: filters.pageSize,
     })

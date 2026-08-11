@@ -11,7 +11,6 @@ import {
   Calendar,
   Users,
   CreditCard,
-  TrendingUp,
   Clock,
   CheckCircle,
   XCircle,
@@ -28,10 +27,10 @@ import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 
 interface DashboardStats {
-  patients: number
-  appointmentsToday: number
-  revenueToday: number
-  growth: number
+  totalPatients: number
+  todayAppointments: number
+  revenueThisMonth: number
+  pendingPayments: number
 }
 
 interface TodaysAppointment {
@@ -45,10 +44,10 @@ interface TodaysAppointment {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
-    patients: 0,
-    appointmentsToday: 0,
-    revenueToday: 0,
-    growth: 0,
+    totalPatients: 0,
+    todayAppointments: 0,
+    revenueThisMonth: 0,
+    pendingPayments: 0,
   })
   const [loading, setLoading] = useState(true)
   const [todaysAppointments, setTodaysAppointments] = useState<TodaysAppointment[]>([])
@@ -148,7 +147,7 @@ export default function AdminDashboard() {
                     Total Patients
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    {displayStats.patients}
+                    {displayStats.totalPatients}
                   </p>
                 </div>
                 <Users className="h-6 w-6 text-brand-600" />
@@ -156,7 +155,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="pt-0">
               <p className="text-xs text-muted-foreground">
-                Active patients in the system
+                Total registered patients
               </p>
             </CardContent>
           </Card>
@@ -169,7 +168,7 @@ export default function AdminDashboard() {
                     Appointments Today
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    {displayStats.appointmentsToday}
+                    {displayStats.todayAppointments}
                   </p>
                 </div>
                 <Calendar className="h-6 w-6 text-brand-600" />
@@ -187,10 +186,10 @@ export default function AdminDashboard() {
               <div className="flex flex-col space-x-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-0.5">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Revenue Today
+                    Revenue This Month
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    ${displayStats.revenueToday.toFixed(2)}
+                    ${displayStats.revenueThisMonth.toFixed(2)}
                   </p>
                 </div>
                 <DollarSign className="h-6 w-6 text-brand-600" />
@@ -198,7 +197,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="pt-0">
               <p className="text-xs text-muted-foreground">
-                Collected today
+                Collected this month
               </p>
             </CardContent>
           </Card>
@@ -208,18 +207,18 @@ export default function AdminDashboard() {
               <div className="flex flex-col space-x-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-0.5">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Growth
+                    Pending Payments
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    {displayStats.growth >= 0 ? '+' : ''}{displayStats.growth}%
+                    {displayStats.pendingPayments}
                   </p>
                 </div>
-                <TrendingUp className="h-6 w-6 text-brand-600" />
+                <CreditCard className="h-6 w-6 text-brand-600" />
               </div>
             </CardHeader>
             <CardContent className="pt-0">
               <p className="text-xs text-muted-foreground">
-                Month over month
+                Awaiting payment
               </p>
             </CardContent>
           </Card>

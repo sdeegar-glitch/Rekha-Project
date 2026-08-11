@@ -93,10 +93,14 @@ export async function GET(request: NextRequest) {
       !existingSlots.some(existing => existing.startTime.getTime() === expected.startTime.getTime())
     )
 
-    // 6. Insert missing slots
+    // 6. Insert missing slots. skipDuplicates guards the race where a
+    // concurrent request (or a slight timestamp mismatch) already inserted
+    // the same (availabilityId, startTime) slot - the unique constraint
+    // would otherwise turn that into a hard 500 for every viewer of this date.
     if (missingSlots.length > 0) {
       await db.timeSlot.createMany({
-        data: missingSlots
+        data: missingSlots,
+        skipDuplicates: true,
       })
     }
 

@@ -51,7 +51,7 @@ function AuthForm() {
 
         // Route based on role
         if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-          router.push('/admin')
+          router.push('/admin/dashboard')
         } else {
           router.push(callbackUrl === '/auth/signin' ? '/' : callbackUrl)
         }
@@ -90,7 +90,7 @@ function AuthForm() {
           const role = session?.user?.role
 
           if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
-            router.push('/admin')
+            router.push('/admin/dashboard')
           } else {
             router.push(callbackUrl === '/auth/signin' ? '/' : callbackUrl)
           }
