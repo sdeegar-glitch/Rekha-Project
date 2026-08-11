@@ -129,10 +129,10 @@ export default function AdminDashboard() {
             Dashboard
           </h1>
           <div className="flex space-x-3">
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" aria-label="Notifications">
               <Bell className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" aria-label="View patients">
               <Users className="h-4 w-4" />
             </Button>
           </div>

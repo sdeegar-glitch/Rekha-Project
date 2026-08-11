@@ -81,7 +81,7 @@ export default function AdminSchedule() {
                           </div>
                         )}
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => deleteAvailability(avail.id)}>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => deleteAvailability(avail.id)} aria-label="Delete availability">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </CardContent>
