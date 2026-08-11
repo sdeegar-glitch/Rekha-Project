@@ -66,9 +66,9 @@ export default function AboutPage() {
             </div>
             
             <div className="w-full md:w-1/2 relative animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <div className="relative aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-3xl overflow-hidden shadow-elevation-3 border border-slate-100 bg-brand-50">
+              <div className="relative aspect-4/5 md:aspect-square lg:aspect-4/3 rounded-3xl overflow-hidden shadow-elevation-3 border border-slate-100 bg-brand-50">
                 {/* Fallback image placeholder with modern gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-200 via-brand-100 to-sage-100 flex items-center justify-center">
+                <div className="absolute inset-0 bg-linear-to-br from-brand-200 via-brand-100 to-sage-100 flex items-center justify-center">
                   <div className="text-center p-8">
                     <GraduationCap className="w-20 h-20 text-brand-600 mx-auto mb-4 opacity-50" />
                     <p className="text-brand-800 font-display text-xl font-medium">Dr. Rekha Patel</p>
@@ -108,7 +108,7 @@ export default function AboutPage() {
             {values.map((value, idx) => {
               const Icon = value.icon
               return (
-                <div key={idx} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <div key={idx} className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 hover:shadow-md transition-shadow">
                   <div className="bg-brand-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 text-brand-600">
                     <Icon className="w-7 h-7" />
                   </div>

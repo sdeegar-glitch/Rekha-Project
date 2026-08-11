@@ -48,7 +48,7 @@ export default function ServicesPage() {
   ]
 
   return (
-    <main className="min-h-screen pt-24 pb-16 bg-gradient-to-b from-brand-50 to-white">
+    <main className="min-h-screen pt-24 pb-16 bg-linear-to-b from-brand-50 to-white">
       <div className="container px-4 md:px-6 mx-auto">
         {/* Header Section */}
         <div className="flex flex-col items-center text-center space-y-4 mb-16 animate-fade-in">
@@ -77,7 +77,7 @@ export default function ServicesPage() {
                   <Icon className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">{service.title}</h3>
-                <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
+                <p className="text-muted-foreground leading-relaxed mb-6 grow">
                   {service.description}
                 </p>
                 <Link href="/booking" className="inline-flex items-center text-brand-600 font-semibold group-hover:text-brand-700 transition-colors mt-auto">

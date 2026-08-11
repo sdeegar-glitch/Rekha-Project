@@ -72,7 +72,7 @@ export default function HomePage() {
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-32" aria-labelledby="hero-heading">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-50 via-background to-sage-50 dark:from-brand-950/20 dark:via-background dark:to-sage-950/20" />
+        <div className="absolute inset-0 bg-linear-to-br from-brand-50 via-background to-sage-50 dark:from-brand-950/20 dark:via-background dark:to-sage-950/20" />
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
         
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">

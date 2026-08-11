@@ -94,7 +94,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = 'SidebarMenuItem'
 
 const sidebarMenuButtonVariants = cva(
-  'flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-sm outline-none ring-sidebar-ring transition-all focus-visible:ring-2 active:ring-2 disabled:pointer-events-none disabled:opacity-50 group/hocus',
+  'flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-sm outline-hidden ring-sidebar-ring transition-all focus-visible:ring-2 active:ring-2 disabled:pointer-events-none disabled:opacity-50 group/hocus',
   {
     variants: {
       variant: {
@@ -160,7 +160,7 @@ const SidebarMenuSubButton = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      'flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-sm outline-none ring-sidebar-ring transition-all focus-visible:ring-2 active:ring-2 disabled:pointer-events-none disabled:opacity-50',
+      'flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-sm outline-hidden ring-sidebar-ring transition-all focus-visible:ring-2 active:ring-2 disabled:pointer-events-none disabled:opacity-50',
       className
     )}
     {...props}

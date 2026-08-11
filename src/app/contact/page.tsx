@@ -98,7 +98,7 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="lg:col-span-3 animate-slide-in-from-right">
             <div className="bg-white rounded-3xl p-8 md:p-10 shadow-elevation-2 border border-slate-100 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-400 via-brand-500 to-sage-400"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-brand-400 via-brand-500 to-sage-400"></div>
               
               <h2 className="text-2xl font-bold mb-8">Send a Message</h2>
               
@@ -128,7 +128,7 @@ export default function ContactPage() {
                         type="text" 
                         id="firstName" 
                         required
-                        className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="John"
                       />
                     </div>
@@ -138,7 +138,7 @@ export default function ContactPage() {
                         type="text" 
                         id="lastName" 
                         required
-                        className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                        className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500"
                         placeholder="Doe"
                       />
                     </div>
@@ -150,7 +150,7 @@ export default function ContactPage() {
                       type="email" 
                       id="email" 
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                      className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500"
                       placeholder="john.doe@example.com"
                     />
                   </div>
@@ -160,7 +160,7 @@ export default function ContactPage() {
                     <select 
                       id="subject"
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                      className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
                       <option value="" disabled selected>Select a subject...</option>
                       <option value="general">General Inquiry</option>
@@ -176,7 +176,7 @@ export default function ContactPage() {
                       id="message" 
                       required
                       rows={5}
-                      className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 resize-none"
+                      className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500 resize-none"
                       placeholder="How can we help you today?"
                     ></textarea>
                   </div>

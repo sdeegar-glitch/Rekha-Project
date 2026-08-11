@@ -210,7 +210,7 @@ function AuthForm() {
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="font-semibold text-blue-600 hover:underline focus:outline-none"
+              className="font-semibold text-blue-600 hover:underline focus:outline-hidden"
             >
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>

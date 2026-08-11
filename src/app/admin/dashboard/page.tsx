@@ -224,7 +224,7 @@ export default function AdminDashboard() {
                   {/* Sample appointment card - replace with actual data */}
                   <div className="border rounded-lg p-4 bg-muted">
                     <div className="flex items-start space-x-4">
-                      <Clock className="h-5 w-5 text-brand-600 flex-shrink-0" />
+                      <Clock className="h-5 w-5 text-brand-600 shrink-0" />
                       <div className="flex-1 space-y-1">
                         <div className="flex items-baseline">
                           <h3 className="text-lg font-semibold text-foreground">

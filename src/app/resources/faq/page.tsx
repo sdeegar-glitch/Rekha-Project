@@ -49,7 +49,7 @@ export default function FAQPage() {
         </div>
 
         {/* FAQ Accordion */}
-        <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-brand-100">
+        <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-xs border border-brand-100">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>

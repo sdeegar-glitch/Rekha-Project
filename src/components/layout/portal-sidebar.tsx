@@ -31,7 +31,7 @@ export function PortalSidebar() {
       <SidebarContent>
         {/* User Profile Section */}
         <div className={cn("p-4 flex items-center gap-3 border-b", collapsed && "justify-center px-2")}>
-          <Avatar className="h-10 w-10 border shadow-sm">
+          <Avatar className="h-10 w-10 border shadow-xs">
             <AvatarImage src={session?.user?.image || ''} alt={session?.user?.name || 'User'} />
             <AvatarFallback className="bg-brand-100 text-brand-700 font-medium">
               {session?.user?.name ? getInitials(session.user.name) : <UserCircle className="h-6 w-6" />}
@@ -62,7 +62,7 @@ export function PortalSidebar() {
                     isActive={pathname === item.href}
                   >
                     <Link href={item.href}>
-                      <item.icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                      <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                       <span className={cn('truncate font-medium', collapsed && 'hidden')}>{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -86,7 +86,7 @@ export function PortalSidebar() {
                       <ChevronRight className="h-5 w-5" />
                     ) : (
                       <>
-                        <ChevronLeft className="h-5 w-5 flex-shrink-0" />
+                        <ChevronLeft className="h-5 w-5 shrink-0" />
                         <span className="font-medium">Collapse Menu</span>
                       </>
                     )}

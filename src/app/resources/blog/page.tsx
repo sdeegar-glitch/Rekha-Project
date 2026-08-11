@@ -10,7 +10,7 @@ export default function BlogPage() {
     <div className="min-h-screen bg-brand-50 pt-24 pb-12">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
         
-        <div className="bg-white rounded-2xl p-12 sm:p-16 shadow-sm border border-brand-100 flex flex-col items-center">
+        <div className="bg-white rounded-2xl p-12 sm:p-16 shadow-xs border border-brand-100 flex flex-col items-center">
           <div className="h-20 w-20 bg-sage-100 rounded-full flex items-center justify-center mb-6">
             <BookOpen className="h-10 w-10 text-sage-600" />
           </div>

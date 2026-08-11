@@ -61,7 +61,7 @@ export function AdminSidebar() {
                     isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
                   >
                     <Link href={item.href}>
-                      <item.icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                      <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                       <span className={cn('truncate', collapsed && 'hidden')}>{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -85,7 +85,7 @@ export function AdminSidebar() {
                       <ChevronRight className="h-5 w-5" />
                     ) : (
                       <>
-                        <ChevronLeft className="h-5 w-5 flex-shrink-0" />
+                        <ChevronLeft className="h-5 w-5 shrink-0" />
                         <span>Collapse</span>
                       </>
                     )}
@@ -104,7 +104,7 @@ export function AdminHeader() {
   const { data: session } = useSession()
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 px-4 sm:px-6">
       <h1 className="text-xl font-semibold">Admin Dashboard</h1>
       <div className="flex-1" />
       

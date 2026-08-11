@@ -540,7 +540,7 @@ export default function BookingPage() {
                             className={cn(
                               'p-3 rounded-lg border-2 text-left transition-all relative overflow-hidden',
                               bookingData.timeSlotId === slot.id
-                                ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/40 shadow-sm ring-2 ring-brand-500/20'
+                                ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/40 shadow-xs ring-2 ring-brand-500/20'
                                 : slot.status === 'AVAILABLE'
                                 ? 'border-green-200 bg-green-50/50 hover:bg-green-50 hover:border-green-400 dark:border-green-900/50 dark:bg-green-900/10 dark:hover:bg-green-900/20 dark:hover:border-green-700'
                                 : 'border-red-100 bg-red-50/30 text-red-400 cursor-not-allowed opacity-60 dark:border-red-900/30 dark:bg-red-900/10'
