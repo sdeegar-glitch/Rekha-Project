@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('PATIENT', 'ADMIN', 'SUPER_ADMIN');
 
@@ -160,9 +163,9 @@ CREATE TABLE "Payment" (
     "amount" DECIMAL(10,2) NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'INR',
     "status" "PaymentStatus" NOT NULL DEFAULT 'PENDING',
-    "stripePaymentIntentId" TEXT,
-    "stripeChargeId" TEXT,
-    "stripeReceiptUrl" TEXT,
+    "razorpayOrderId" TEXT,
+    "razorpayPaymentId" TEXT,
+    "razorpaySignature" TEXT,
     "method" TEXT,
     "metadata" JSONB,
     "refundedAmount" DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -222,7 +225,7 @@ CREATE TABLE "ClinicSettings" (
     "cancellationPolicy" TEXT NOT NULL,
     "reminderHours" INTEGER NOT NULL DEFAULT 24,
     "allowOnlinePayment" BOOLEAN NOT NULL DEFAULT true,
-    "stripeAccountId" TEXT,
+    "razorpayAccountId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -287,6 +290,9 @@ CREATE INDEX "TimeSlot_status_idx" ON "TimeSlot"("status");
 CREATE INDEX "TimeSlot_parentSlotId_idx" ON "TimeSlot"("parentSlotId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "TimeSlot_availabilityId_startTime_key" ON "TimeSlot"("availabilityId", "startTime");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Appointment_timeSlotId_key" ON "Appointment"("timeSlotId");
 
 -- CreateIndex
@@ -314,7 +320,7 @@ CREATE INDEX "Appointment_patientId_status_idx" ON "Appointment"("patientId", "s
 CREATE UNIQUE INDEX "Payment_appointmentId_key" ON "Payment"("appointmentId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Payment_stripePaymentIntentId_key" ON "Payment"("stripePaymentIntentId");
+CREATE UNIQUE INDEX "Payment_razorpayOrderId_key" ON "Payment"("razorpayOrderId");
 
 -- CreateIndex
 CREATE INDEX "Payment_patientId_idx" ON "Payment"("patientId");
@@ -323,7 +329,7 @@ CREATE INDEX "Payment_patientId_idx" ON "Payment"("patientId");
 CREATE INDEX "Payment_status_idx" ON "Payment"("status");
 
 -- CreateIndex
-CREATE INDEX "Payment_stripePaymentIntentId_idx" ON "Payment"("stripePaymentIntentId");
+CREATE INDEX "Payment_razorpayOrderId_idx" ON "Payment"("razorpayOrderId");
 
 -- CreateIndex
 CREATE INDEX "Payment_createdAt_idx" ON "Payment"("createdAt");
@@ -390,3 +396,4 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
