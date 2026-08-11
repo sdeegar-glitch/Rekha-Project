@@ -12,11 +12,6 @@ export default function AdminSchedule() {
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchAvailability()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const fetchAvailability = async () => {
     try {
       const res = await fetch('/api/admin/availability')
@@ -29,6 +24,12 @@ export default function AdminSchedule() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState happens async after the fetch resolves, not synchronously
+    fetchAvailability()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const deleteAvailability = async (id: string) => {
     // Basic implementation for deleting. Ideally we'd have a DELETE endpoint in the API.

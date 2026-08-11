@@ -15,11 +15,6 @@ export default function AdminPatients() {
   const [search, setSearch] = useState('')
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchPatients()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const fetchPatients = async () => {
     try {
       // In a real app, you would have an endpoint for this.
@@ -31,6 +26,12 @@ export default function AdminPatients() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState happens async after the fetch resolves, not synchronously
+    fetchPatients()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <AdminLayout>

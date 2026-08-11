@@ -11,8 +11,9 @@ export function generateStaticParams() {
   }))
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const service = getServiceBySlug(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const service = getServiceBySlug(slug)
   if (!service) {
     return { title: 'Service Not Found' }
   }
@@ -22,8 +23,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   }
 }
 
-export default function ServicePage({ params }: { params: { slug: string } }) {
-  const service = getServiceBySlug(params.slug)
+export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const service = getServiceBySlug(slug)
 
   if (!service) {
     notFound()

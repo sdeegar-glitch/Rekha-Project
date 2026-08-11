@@ -247,7 +247,6 @@ export function useSocket(options: UseSocketOptions = {}) {
   }, [])
 
   return {
-    socket: socketRef.current,
     isConnected,
     connectionError,
     subscribe,

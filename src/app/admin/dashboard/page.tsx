@@ -45,6 +45,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const { stats: socketStats, isConnected } = useAdminStats()
   const { toast } = useToast()
+  const displayStats = (socketStats as DashboardStats | undefined) ?? stats
 
   useEffect(() => {
     // Fetch dashboard stats as fallback
@@ -66,9 +67,9 @@ export default function AdminDashboard() {
       }
     }
 
-    // Use socket stats if available, otherwise fetch
+    // Fetch as a fallback when socket stats aren't available yet
     if (socketStats) {
-      setStats(socketStats as DashboardStats)
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- loading tracks socket availability, not a value derivable from render
       setLoading(false)
     } else {
       fetchStats()
@@ -117,7 +118,7 @@ export default function AdminDashboard() {
                     Total Patients
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    {stats.patients}
+                    {displayStats.patients}
                   </p>
                 </div>
                 <Users className="h-6 w-6 text-brand-600" />
@@ -138,7 +139,7 @@ export default function AdminDashboard() {
                     Appointments Today
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    {stats.appointmentsToday}
+                    {displayStats.appointmentsToday}
                   </p>
                 </div>
                 <Calendar className="h-6 w-6 text-brand-600" />
@@ -159,7 +160,7 @@ export default function AdminDashboard() {
                     Revenue Today
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    ${stats.revenueToday.toFixed(2)}
+                    ${displayStats.revenueToday.toFixed(2)}
                   </p>
                 </div>
                 <DollarSign className="h-6 w-6 text-brand-600" />
@@ -180,7 +181,7 @@ export default function AdminDashboard() {
                     Growth
                   </CardTitle>
                   <p className="text-2xl font-semibold text-foreground">
-                    {stats.growth >= 0 ? '+' : ''}{stats.growth}%
+                    {displayStats.growth >= 0 ? '+' : ''}{displayStats.growth}%
                   </p>
                 </div>
                 <TrendingUp className="h-6 w-6 text-brand-600" />

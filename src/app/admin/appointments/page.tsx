@@ -15,11 +15,6 @@ export default function AdminAppointments() {
   const [search, setSearch] = useState('')
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchAppointments()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const fetchAppointments = async () => {
     try {
       const res = await fetch('/api/admin/appointments?pageSize=50')
@@ -32,6 +27,12 @@ export default function AdminAppointments() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- setState happens async after the fetch resolves, not synchronously
+    fetchAppointments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const updateStatus = async (id: string, status: string) => {
     try {

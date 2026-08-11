@@ -1,6 +1,7 @@
 // Layout Components - Footer
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Linkedin } from '@/components/icons/social'
 
 export function Footer() {
   const footerLinks = {

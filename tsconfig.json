@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -10,7 +14,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -18,17 +22,40 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/validators/*": ["./src/validators/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
+      ],
+      "@/validators/*": [
+        "./src/validators/*"
+      ]
     },
     "baseUrl": ".",
     "target": "ES2017",
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "src/lib/socket/server.ts"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "src/lib/socket/server.ts"
+  ]
 }

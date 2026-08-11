@@ -142,9 +142,12 @@ export default function BookingPage() {
     }
   }, [bookingData.timeSlotId, emitUnlockSlot])
 
-  // Pre-fill patient info if logged in
+  // Pre-fill patient info if logged in. This intentionally seeds editable
+  // form state from the session rather than deriving it during render, since
+  // the fields must remain user-editable afterward.
   useEffect(() => {
     if (session?.user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBookingData((prev) => ({
         ...prev,
         patientInfo: {
