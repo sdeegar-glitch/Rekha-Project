@@ -10,9 +10,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, User, CreditCard, CheckCircle, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, startOfDay } from 'date-fns'
+import { format, parse, subYears, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, startOfDay } from 'date-fns'
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/hooks/use-toast'
 import { services } from '@/lib/constants'
@@ -84,6 +86,7 @@ export default function BookingPage() {
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [processingPayment, setProcessingPayment] = useState(false)
+  const [dobPickerOpen, setDobPickerOpen] = useState(false)
 
   // Real-time slot updates
   const { isConnected, emitLockSlot, emitUnlockSlot } = useSocket({
@@ -382,49 +385,60 @@ export default function BookingPage() {
     <div className="min-h-screen py-12">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Progress Indicator */}
-        <div className="mb-8" role="navigation" aria-label="Booking progress">
-          <ol className="flex items-center" aria-label="Booking steps">
-            {STEPS.map((step, index) => (
-              <li key={step.id} className="flex items-center">
-                <div
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-all',
-                    currentStep === step.id || index < STEPS.findIndex((s) => s.id === currentStep)
-                      ? 'bg-brand-600 text-white'
-                      : 'bg-muted text-muted-foreground'
-                  )}
-                  aria-current={currentStep === step.id ? 'step' : undefined}
-                >
-                  {index < STEPS.findIndex((s) => s.id === currentStep) ? (
-                    <CheckCircle className="h-5 w-5" />
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-                {index < STEPS.length - 1 && (
-                  <div
-                    className={cn(
-                      'h-1 w-full max-w-[120px] mx-2 transition-colors',
-                      index < STEPS.findIndex((s) => s.id === currentStep)
-                        ? 'bg-brand-600'
-                        : 'bg-muted'
-                    )}
-                  />
-                )}
-              </li>
-            ))}
-          </ol>
-          <div className="mt-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Step {STEPS.findIndex((s) => s.id === currentStep) + 1} of {STEPS.length}:{' '}
-              <span className="font-medium text-foreground">
-                {STEPS.find((s) => s.id === currentStep)?.title}
-              </span>
-            </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {STEPS.find((s) => s.id === currentStep)?.description}
-            </p>
+        <div className="mb-10" role="navigation" aria-label="Booking progress">
+          <div className="h-[3px] w-full bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-[width] duration-500 ease-out"
+              style={{
+                width: `${(STEPS.findIndex((s) => s.id === currentStep) / (STEPS.length - 1)) * 100}%`,
+              }}
+            />
           </div>
+          <ol className="mt-4 flex items-start justify-between gap-2 sm:gap-4" aria-label="Booking steps">
+            {STEPS.map((step, index) => {
+              const currentIndex = STEPS.findIndex((s) => s.id === currentStep)
+              const isCurrent = step.id === currentStep
+              const isDone = index < currentIndex
+              return (
+                <li key={step.id} className="flex-1 min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => goToStep(step.id)}
+                    disabled={index > currentIndex}
+                    className={cn(
+                      'w-full text-left group',
+                      index > currentIndex ? 'cursor-default' : 'cursor-pointer'
+                    )}
+                    aria-current={isCurrent ? 'step' : undefined}
+                  >
+                    <span
+                      className={cn(
+                        'flex items-center gap-1.5 font-mono text-[11px] tracking-wide uppercase',
+                        isCurrent ? 'text-primary' : isDone ? 'text-foreground' : 'text-muted-foreground'
+                      )}
+                    >
+                      {isDone ? <CheckCircle className="h-3 w-3" /> : String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span
+                      className={cn(
+                        'mt-1 hidden sm:block font-display text-base truncate transition-colors',
+                        isCurrent
+                          ? 'text-foreground font-medium'
+                          : isDone
+                            ? 'text-muted-foreground group-hover:text-foreground'
+                            : 'text-muted-foreground/60'
+                      )}
+                    >
+                      {step.title}
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {STEPS.find((s) => s.id === currentStep)?.description}
+          </p>
         </div>
 
         {/* Step Content */}
@@ -523,7 +537,7 @@ export default function BookingPage() {
                   <CardContent>
                     {loadingSlots ? (
                       <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-brand-600" />
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
                       </div>
                     ) : !selectedDate ? (
                       <p className="text-center text-sm text-muted-foreground py-8">
@@ -534,46 +548,36 @@ export default function BookingPage() {
                         No available slots for this date
                       </p>
                     ) : (
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {availableSlots.map((slot) => (
-                          <button
-                            key={slot.id}
-                            onClick={() => handleSlotSelect(slot.id)}
-                            disabled={slot.status !== 'AVAILABLE' && bookingData.timeSlotId !== slot.id}
-                            className={cn(
-                              'p-3 rounded-lg border-2 text-left transition-all relative overflow-hidden',
-                              bookingData.timeSlotId === slot.id
-                                ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/40 shadow-xs ring-2 ring-brand-500/20'
-                                : slot.status === 'AVAILABLE'
-                                ? 'border-green-200 bg-green-50/50 hover:bg-green-50 hover:border-green-400 dark:border-green-900/50 dark:bg-green-900/10 dark:hover:bg-green-900/20 dark:hover:border-green-700'
-                                : 'border-red-100 bg-red-50/30 text-red-400 cursor-not-allowed opacity-60 dark:border-red-900/30 dark:bg-red-900/10'
-                            )}
-                          >
-                            <div className={cn(
-                              "font-semibold text-lg",
-                              slot.status === 'AVAILABLE' ? 'text-green-700 dark:text-green-400' : 'text-red-700/70 dark:text-red-400/70',
-                              bookingData.timeSlotId === slot.id && 'text-brand-700 dark:text-brand-300'
-                            )}>
-                              {format(new Date(slot.startTime), 'h:mm a')} - {format(new Date(slot.endTime), 'h:mm a')}
-                            </div>
-                            <div className={cn(
-                              "text-sm font-medium mt-1 flex items-center gap-1.5",
-                              slot.status === 'AVAILABLE' ? 'text-green-600 dark:text-green-500' : 'text-red-600/70 dark:text-red-500/70',
-                              bookingData.timeSlotId === slot.id && 'text-brand-600 dark:text-brand-400'
-                            )}>
-                              <div className={cn(
-                                "h-1.5 w-1.5 rounded-full",
-                                slot.status === 'AVAILABLE' ? 'bg-green-500' : 'bg-red-500',
-                                bookingData.timeSlotId === slot.id && 'bg-brand-500 animate-pulse'
-                              )} />
-                              {slot.status === 'AVAILABLE' 
-                                ? 'Available to Book' 
-                                : slot.status === 'LOCKED'
-                                  ? (bookingData.timeSlotId === slot.id ? 'Selected (Locked 5m)' : 'Currently Locked')
-                                  : 'Not Available'}
-                            </div>
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        {availableSlots.map((slot) => {
+                          const isSelected = bookingData.timeSlotId === slot.id
+                          const isTaken = slot.status !== 'AVAILABLE' && !isSelected
+                          return (
+                            <button
+                              key={slot.id}
+                              onClick={() => handleSlotSelect(slot.id)}
+                              disabled={isTaken}
+                              className={cn(
+                                'rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                                isSelected
+                                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                                  : isTaken
+                                    ? 'border-input/30 text-muted-foreground/50 line-through cursor-not-allowed'
+                                    : 'border-input/60 bg-background text-foreground hover:border-primary/50 hover:bg-accent'
+                              )}
+                            >
+                              {format(new Date(slot.startTime), 'h:mm a')}
+                              {isSelected && (
+                                <span className="block text-[11px] font-normal text-primary-foreground/80 mt-0.5">
+                                  Held for 5 min
+                                </span>
+                              )}
+                              {slot.status === 'LOCKED' && !isSelected && (
+                                <span className="block text-[11px] font-normal mt-0.5">Held by another</span>
+                              )}
+                            </button>
+                          )
+                        })}
                       </div>
                     )}
                   </CardContent>
@@ -633,14 +637,47 @@ export default function BookingPage() {
                       </div>
                       <div>
                         <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                        <Input
-                          id="dateOfBirth"
-                          type="date"
-                          value={bookingData.patientInfo.dateOfBirth}
-                          onChange={(e) => handlePatientInfoChange('dateOfBirth', e.target.value)}
-                          required
-                          max={format(new Date(), 'yyyy-MM-dd')}
-                        />
+                        <Popover open={dobPickerOpen} onOpenChange={setDobPickerOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              id="dateOfBirth"
+                              type="button"
+                              variant="outline"
+                              className="w-full justify-start font-normal text-sm"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                              {bookingData.patientInfo.dateOfBirth ? (
+                                format(
+                                  parse(bookingData.patientInfo.dateOfBirth, 'yyyy-MM-dd', new Date()),
+                                  'MMMM d, yyyy'
+                                )
+                              ) : (
+                                <span className="text-muted-foreground">Select your date of birth</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-3" align="start">
+                            <Calendar
+                              captionLayout="dropdown"
+                              selected={
+                                bookingData.patientInfo.dateOfBirth
+                                  ? parse(bookingData.patientInfo.dateOfBirth, 'yyyy-MM-dd', new Date())
+                                  : null
+                              }
+                              defaultMonth={
+                                bookingData.patientInfo.dateOfBirth
+                                  ? parse(bookingData.patientInfo.dateOfBirth, 'yyyy-MM-dd', new Date())
+                                  : subYears(new Date(), 30)
+                              }
+                              onSelect={(date) => {
+                                handlePatientInfoChange('dateOfBirth', format(date, 'yyyy-MM-dd'))
+                                setDobPickerOpen(false)
+                              }}
+                              fromDate={subYears(new Date(), 120)}
+                              toDate={new Date()}
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </div>
                     <div>
@@ -657,77 +694,85 @@ export default function BookingPage() {
                 </Card>
 
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Emergency Contact (Optional)</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      <div>
-                        <Label htmlFor="ecName">Name</Label>
-                        <Input
-                          id="ecName"
-                          value={bookingData.patientInfo.emergencyContact?.name || ''}
-                          onChange={(e) => handleEmergencyContactChange('name', e.target.value)}
-                          placeholder="Emergency contact name"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="ecPhone">Phone</Label>
-                        <Input
-                          id="ecPhone"
-                          type="tel"
-                          value={bookingData.patientInfo.emergencyContact?.phone || ''}
-                          onChange={(e) => handleEmergencyContactChange('phone', e.target.value)}
-                          placeholder="+91 98765 43210"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="ecRelationship">Relationship</Label>
-                        <Select
-                          value={bookingData.patientInfo.emergencyContact?.relationship || ''}
-                          onValueChange={(value) => handleEmergencyContactChange('relationship', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select relationship" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="spouse">Spouse</SelectItem>
-                            <SelectItem value="parent">Parent</SelectItem>
-                            <SelectItem value="sibling">Sibling</SelectItem>
-                            <SelectItem value="friend">Friend</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <CardContent className="py-0">
+                    <Accordion type="multiple" className="[&>*:last-child]:border-b-0">
+                      <AccordionItem value="emergency-contact">
+                        <AccordionTrigger className="text-sm font-semibold text-foreground hover:no-underline">
+                          Emergency Contact <span className="ml-2 font-normal text-muted-foreground">(Optional)</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="grid gap-4 sm:grid-cols-3">
+                            <div>
+                              <Label htmlFor="ecName">Name</Label>
+                              <Input
+                                id="ecName"
+                                value={bookingData.patientInfo.emergencyContact?.name || ''}
+                                onChange={(e) => handleEmergencyContactChange('name', e.target.value)}
+                                placeholder="Emergency contact name"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="ecPhone">Phone</Label>
+                              <Input
+                                id="ecPhone"
+                                type="tel"
+                                value={bookingData.patientInfo.emergencyContact?.phone || ''}
+                                onChange={(e) => handleEmergencyContactChange('phone', e.target.value)}
+                                placeholder="+91 98765 43210"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="ecRelationship">Relationship</Label>
+                              <Select
+                                value={bookingData.patientInfo.emergencyContact?.relationship || ''}
+                                onValueChange={(value) => handleEmergencyContactChange('relationship', value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select relationship" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="spouse">Spouse</SelectItem>
+                                  <SelectItem value="parent">Parent</SelectItem>
+                                  <SelectItem value="sibling">Sibling</SelectItem>
+                                  <SelectItem value="friend">Friend</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Appointment Details (Optional)</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="reason">Reason for Visit</Label>
-                      <Textarea
-                        id="reason"
-                        value={bookingData.reason}
-                        onChange={(e) => setBookingData((prev) => ({ ...prev, reason: e.target.value }))}
-                        placeholder="Briefly describe why you're seeking therapy"
-                        rows={3}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="notes">Additional Notes</Label>
-                      <Textarea
-                        id="notes"
-                        value={bookingData.notes}
-                        onChange={(e) => setBookingData((prev) => ({ ...prev, notes: e.target.value }))}
-                        placeholder="Any other information you'd like to share"
-                        rows={3}
-                      />
-                    </div>
+                      <AccordionItem value="appointment-details">
+                        <AccordionTrigger className="text-sm font-semibold text-foreground hover:no-underline">
+                          Appointment Details <span className="ml-2 font-normal text-muted-foreground">(Optional)</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="reason">Reason for Visit</Label>
+                              <Textarea
+                                id="reason"
+                                value={bookingData.reason}
+                                onChange={(e) => setBookingData((prev) => ({ ...prev, reason: e.target.value }))}
+                                placeholder="Briefly describe why you're seeking therapy"
+                                rows={3}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="notes">Additional Notes</Label>
+                              <Textarea
+                                id="notes"
+                                value={bookingData.notes}
+                                onChange={(e) => setBookingData((prev) => ({ ...prev, notes: e.target.value }))}
+                                placeholder="Any other information you'd like to share"
+                                rows={3}
+                              />
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </CardContent>
                 </Card>
               </form>

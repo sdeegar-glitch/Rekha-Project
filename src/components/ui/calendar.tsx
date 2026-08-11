@@ -13,6 +13,8 @@ export interface CalendarProps {
   fromDate?: Date
   toDate?: Date
   disabled?: boolean
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years'
+  defaultMonth?: Date
 }
 
 export function Calendar({
@@ -23,6 +25,8 @@ export function Calendar({
   fromDate,
   toDate,
   disabled,
+  captionLayout = 'label',
+  defaultMonth,
 }: CalendarProps) {
   const dateMatchers: Matcher[] = []
   if (fromDate) dateMatchers.push({ before: fromDate })
@@ -37,6 +41,8 @@ export function Calendar({
         disabled={dateMatchers}
         startMonth={fromDate}
         endMonth={toDate}
+        defaultMonth={defaultMonth ?? selected ?? undefined}
+        captionLayout={captionLayout}
         autoFocus={!!initialFocus}
         showOutsideDays
         className="w-full"
@@ -52,6 +58,13 @@ export function Calendar({
           months: 'flex flex-col',
           month: 'space-y-4 w-full',
           month_caption: 'flex justify-center items-center h-9 relative font-medium text-foreground',
+          dropdowns: 'flex items-center justify-center gap-1.5',
+          dropdown_root: 'relative inline-flex items-center',
+          dropdown:
+            'appearance-none bg-transparent text-sm font-medium text-foreground rounded-md pl-2 pr-5 py-1 cursor-pointer hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
+          months_dropdown: 'z-10',
+          years_dropdown: 'z-10',
+          caption_label: 'font-medium text-foreground',
           nav: 'flex items-center justify-between absolute inset-x-0 top-0 h-9',
           button_previous:
             'h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors',
