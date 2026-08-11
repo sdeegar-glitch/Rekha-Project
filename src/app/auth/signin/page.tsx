@@ -105,13 +105,13 @@ function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-        <div className="p-8 text-center bg-blue-50 border-b border-blue-100">
-          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+      <div className="w-full max-w-md bg-card rounded-2xl shadow-xl overflow-hidden border border-border">
+        <div className="p-8 text-center bg-primary/5 border-b border-primary/10">
+          <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
-          <p className="text-slate-600 mt-2">
+          <p className="text-muted-foreground mt-2">
             {isLogin 
               ? 'Sign in to access your appointments and records.' 
               : 'Sign up to book appointments and track your progress.'}
@@ -150,7 +150,7 @@ function AuthForm() {
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
               {isLogin && (
-                <Link href="#" className="text-sm text-blue-600 hover:underline">
+                <Link href="#" className="text-sm text-primary hover:underline">
                   Forgot password?
                 </Link>
               )}
@@ -182,10 +182,10 @@ function AuthForm() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-slate-500">Or continue with</span>
+              <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -205,12 +205,12 @@ function AuthForm() {
           </Button>
         </form>
 
-        <div className="p-6 text-center bg-slate-50 border-t border-slate-100">
-          <p className="text-sm text-slate-600">
+        <div className="p-6 text-center bg-muted/50 border-t border-border">
+          <p className="text-sm text-muted-foreground">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="font-semibold text-blue-600 hover:underline focus:outline-hidden"
+              className="font-semibold text-primary hover:underline focus:outline-hidden"
             >
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
@@ -223,7 +223,7 @@ function AuthForm() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-muted/50"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
       <AuthForm />
     </Suspense>
   )

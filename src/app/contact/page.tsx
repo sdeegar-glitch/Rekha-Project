@@ -48,7 +48,7 @@ export default function ContactPage() {
   ]
 
   return (
-    <main className="min-h-screen pt-24 pb-16 bg-slate-50">
+    <main className="min-h-screen pt-24 pb-16 bg-muted/50">
       <div className="container px-4 md:px-6 mx-auto">
         
         {/* Header */}
@@ -65,7 +65,7 @@ export default function ContactPage() {
           
           {/* Contact Information */}
           <div className="lg:col-span-2 space-y-8 animate-slide-in-from-left">
-            <div className="bg-white rounded-3xl p-8 shadow-soft border border-slate-100">
+            <div className="bg-card rounded-3xl p-8 shadow-soft border border-border">
               <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
               <div className="space-y-6">
                 {contactInfo.map((info, idx) => {
@@ -97,7 +97,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-3 animate-slide-in-from-right">
-            <div className="bg-white rounded-3xl p-8 md:p-10 shadow-elevation-2 border border-slate-100 relative overflow-hidden">
+            <div className="bg-card rounded-3xl p-8 md:p-10 shadow-elevation-2 border border-border relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-brand-400 via-brand-500 to-sage-400"></div>
               
               <h2 className="text-2xl font-bold mb-8">Send a Message</h2>

@@ -70,7 +70,7 @@ export default function ServicesPage() {
             return (
               <div 
                 key={service.title}
-                className="group relative flex flex-col items-start p-8 bg-white rounded-3xl shadow-soft hover:shadow-card-hover transition-all duration-300 border border-slate-100 animate-slide-in-from-bottom"
+                className="group relative flex flex-col items-start p-8 bg-card rounded-3xl shadow-soft hover:shadow-card-hover transition-all duration-300 border border-border animate-slide-in-from-bottom"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className={`p-4 rounded-2xl mb-6 transition-transform duration-300 group-hover:scale-110 ${service.color}`}>

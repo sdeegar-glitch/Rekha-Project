@@ -44,7 +44,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </div>
 
         {/* Header Section */}
-        <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-xs border border-brand-100 mb-8 text-center sm:text-left relative overflow-hidden">
+        <div className="bg-card rounded-2xl p-8 sm:p-12 shadow-xs border border-border mb-8 text-center sm:text-left relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-sage-100 rounded-full blur-3xl -mr-32 -mt-32 opacity-50"></div>
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-brand-900 mb-4 relative z-10">{service.title}</h1>
           <p className="text-lg text-brand-700 max-w-2xl relative z-10">{service.shortDescription}</p>
@@ -55,12 +55,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           
           {/* Main Content */}
           <div className="md:col-span-2 space-y-8">
-            <section className="bg-white rounded-2xl p-8 shadow-xs border border-brand-100">
+            <section className="bg-card rounded-2xl p-8 shadow-xs border border-border">
               <h2 className="text-2xl font-display font-semibold text-brand-900 mb-4">About this Service</h2>
               <p className="text-brand-700 leading-relaxed whitespace-pre-line">{service.fullDescription}</p>
             </section>
 
-            <section className="bg-white rounded-2xl p-8 shadow-xs border border-brand-100">
+            <section className="bg-card rounded-2xl p-8 shadow-xs border border-border">
               <h2 className="text-2xl font-display font-semibold text-brand-900 mb-4">Key Benefits</h2>
               <ul className="space-y-4">
                 {service.benefits.map((benefit, index) => (
@@ -75,7 +75,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
           {/* Sidebar / CTA */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-xs border border-brand-100">
+            <div className="bg-card rounded-2xl p-6 shadow-xs border border-border">
               <h3 className="text-lg font-semibold text-brand-900 mb-4">Session Details</h3>
               
               <div className="space-y-4 mb-8">

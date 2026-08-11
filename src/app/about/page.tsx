@@ -35,7 +35,7 @@ export default function AboutPage() {
   ]
 
   return (
-    <main className="min-h-screen pt-24 pb-16 bg-white overflow-hidden">
+    <main className="min-h-screen pt-24 pb-16 bg-background overflow-hidden">
       {/* Hero Section */}
       <section className="relative pb-16 pt-8 md:pt-16">
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-brand-100 rounded-full blur-3xl opacity-50"></div>
@@ -66,7 +66,7 @@ export default function AboutPage() {
             </div>
             
             <div className="w-full md:w-1/2 relative animate-fade-in" style={{ animationDelay: '200ms' }}>
-              <div className="relative aspect-4/5 md:aspect-square lg:aspect-4/3 rounded-3xl overflow-hidden shadow-elevation-3 border border-slate-100 bg-brand-50">
+              <div className="relative aspect-4/5 md:aspect-square lg:aspect-4/3 rounded-3xl overflow-hidden shadow-elevation-3 border border-border bg-brand-50 dark:bg-brand-950/30">
                 {/* Fallback image placeholder with modern gradient */}
                 <div className="absolute inset-0 bg-linear-to-br from-brand-200 via-brand-100 to-sage-100 flex items-center justify-center">
                   <div className="text-center p-8">
@@ -77,7 +77,7 @@ export default function AboutPage() {
               </div>
               
               {/* Floating Badge */}
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-elevation-4 border border-slate-100 animate-slide-in-from-bottom" style={{ animationDelay: '400ms' }}>
+              <div className="absolute -bottom-6 -left-6 bg-card p-6 rounded-2xl shadow-elevation-4 border border-border animate-slide-in-from-bottom" style={{ animationDelay: '400ms' }}>
                 <div className="flex items-center gap-4">
                   <div className="bg-sage-100 p-3 rounded-full text-sage-600">
                     <Award className="w-6 h-6" />
@@ -94,7 +94,7 @@ export default function AboutPage() {
       </section>
 
       {/* Philosophy & Values */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-muted/50">
         <div className="container px-4 md:px-6 mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-6">Our Philosophy</h2>
@@ -108,7 +108,7 @@ export default function AboutPage() {
             {values.map((value, idx) => {
               const Icon = value.icon
               return (
-                <div key={idx} className="bg-white p-8 rounded-3xl shadow-xs border border-slate-100 hover:shadow-md transition-shadow">
+                <div key={idx} className="bg-card p-8 rounded-3xl shadow-xs border border-border hover:shadow-md transition-shadow">
                   <div className="bg-brand-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 text-brand-600">
                     <Icon className="w-7 h-7" />
                   </div>
