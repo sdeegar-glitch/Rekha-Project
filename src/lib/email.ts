@@ -4,9 +4,9 @@ import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key')
 
 // Admin email for notifications
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@rekhapatel.com'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'hello@rekhapatelpsychology.com'
 // Default sender
-const FROM_EMAIL = 'Rekha Patel Psychology <noreply@rekhapatel.com>'
+const FROM_EMAIL = 'Rekha Patel Psychology <noreply@rekhapatelpsychology.com>'
 
 export async function sendEmail({
   to,

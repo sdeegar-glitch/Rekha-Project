@@ -1,23 +1,42 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
+import { contactFormSchema, type ContactForm } from '@/validators'
 
 export default function ContactPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { toast } = useToast()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ContactForm>({ resolver: zodResolver(contactFormSchema) })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    // Simulate network request
-    setTimeout(() => {
-      setIsSubmitting(false)
+  const onSubmit = async (data: ContactForm) => {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!res.ok) throw new Error('Failed to send message')
+
       setIsSuccess(true)
-      // Reset success message after 5 seconds
+      reset()
       setTimeout(() => setIsSuccess(false), 5000)
-    }, 1500)
+    } catch {
+      toast({
+        title: 'Something went wrong',
+        description: "Your message couldn't be sent. Please try again.",
+        variant: 'destructive',
+      })
+    }
   }
 
   const contactInfo = [
@@ -120,69 +139,95 @@ export default function ContactPage() {
                   </Button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="firstName" className="text-sm font-medium text-foreground">First Name</label>
-                      <input 
-                        type="text" 
-                        id="firstName" 
-                        required
+                      <input
+                        type="text"
+                        id="firstName"
+                        aria-invalid={!!errors.firstName}
+                        aria-describedby={errors.firstName ? 'firstName-error' : undefined}
                         className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="John"
+                        {...register('firstName')}
                       />
+                      {errors.firstName && (
+                        <p id="firstName-error" className="text-sm text-destructive">{errors.firstName.message}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="lastName" className="text-sm font-medium text-foreground">Last Name</label>
-                      <input 
-                        type="text" 
-                        id="lastName" 
-                        required
+                      <input
+                        type="text"
+                        id="lastName"
+                        aria-invalid={!!errors.lastName}
+                        aria-describedby={errors.lastName ? 'lastName-error' : undefined}
                         className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500"
                         placeholder="Doe"
+                        {...register('lastName')}
                       />
+                      {errors.lastName && (
+                        <p id="lastName-error" className="text-sm text-destructive">{errors.lastName.message}</p>
+                      )}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-medium text-foreground">Email Address</label>
-                    <input 
-                      type="email" 
-                      id="email" 
-                      required
+                    <input
+                      type="email"
+                      id="email"
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
                       className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500"
                       placeholder="john.doe@example.com"
+                      {...register('email')}
                     />
+                    {errors.email && (
+                      <p id="email-error" className="text-sm text-destructive">{errors.email.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="subject" className="text-sm font-medium text-foreground">Subject</label>
-                    <select 
+                    <select
                       id="subject"
-                      required
+                      defaultValue=""
+                      aria-invalid={!!errors.subject}
+                      aria-describedby={errors.subject ? 'subject-error' : undefined}
                       className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500"
+                      {...register('subject')}
                     >
-                      <option value="" disabled selected>Select a subject...</option>
+                      <option value="" disabled>Select a subject...</option>
                       <option value="general">General Inquiry</option>
                       <option value="services">Questions about Services</option>
                       <option value="booking">Help with Booking</option>
                       <option value="other">Other</option>
                     </select>
+                    {errors.subject && (
+                      <p id="subject-error" className="text-sm text-destructive">{errors.subject.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="message" className="text-sm font-medium text-foreground">Message</label>
-                    <textarea 
-                      id="message" 
-                      required
+                    <textarea
+                      id="message"
                       rows={5}
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? 'message-error' : undefined}
                       className="w-full px-4 py-3 rounded-xl border border-input bg-transparent shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-500 resize-none"
                       placeholder="How can we help you today?"
+                      {...register('message')}
                     ></textarea>
+                    {errors.message && (
+                      <p id="message-error" className="text-sm text-destructive">{errors.message.message}</p>
+                    )}
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isSubmitting}
                     className="w-full h-12 rounded-xl text-base font-semibold"
                   >

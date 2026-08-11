@@ -266,6 +266,17 @@ export const searchSchema = z.object({
   pageSize: z.number().int().positive().max(50).default(20),
 })
 
+// Contact form
+export const contactFormSchema = z.object({
+  firstName: z.string().min(1, 'First name is required').max(100),
+  lastName: z.string().min(1, 'Last name is required').max(100),
+  email: emailSchema,
+  subject: z.enum(['general', 'services', 'booking', 'other'], {
+    message: 'Please select a subject',
+  }),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(5000),
+})
+
 // Export all schemas
 export const validators = {
   id: idSchema,
@@ -343,3 +354,4 @@ export type Refund = InferSchema<typeof refundSchema>
 export type NotificationCreate = InferSchema<typeof notificationCreateSchema>
 export type ClinicSettingsUpdate = InferSchema<typeof clinicSettingsUpdateSchema>
 export type Search = InferSchema<typeof searchSchema>
+export type ContactForm = InferSchema<typeof contactFormSchema>
