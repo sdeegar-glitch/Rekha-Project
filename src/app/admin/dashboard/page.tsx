@@ -25,7 +25,6 @@ import {
 import { format, startOfDay, endOfDay, subDays, addDays } from 'date-fns'
 import { useSocket, useAdminStats } from '@/hooks/useSocket'
 import { useToast } from '@/hooks/use-toast'
-import { AppointmentStatus } from '@/types'
 import { cn } from '@/lib/utils'
 
 interface DashboardStats {
@@ -33,6 +32,15 @@ interface DashboardStats {
   appointmentsToday: number
   revenueToday: number
   growth: number
+}
+
+interface TodaysAppointment {
+  id: string
+  status: string
+  time: string
+  service: { name: string }
+  patient: { name: string | null }
+  admin: { name: string | null } | null
 }
 
 export default function AdminDashboard() {
@@ -43,6 +51,8 @@ export default function AdminDashboard() {
     growth: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [todaysAppointments, setTodaysAppointments] = useState<TodaysAppointment[]>([])
+  const [appointmentsLoading, setAppointmentsLoading] = useState(true)
   const { stats: socketStats, isConnected } = useAdminStats()
   const { toast } = useToast()
   const displayStats = (socketStats as DashboardStats | undefined) ?? stats
@@ -79,6 +89,26 @@ export default function AdminDashboard() {
     const interval = setInterval(fetchStats, 5 * 60 * 1000) // 5 minutes
     return () => clearInterval(interval)
   }, [socketStats, isConnected, toast])
+
+  useEffect(() => {
+    const fetchTodaysAppointments = async () => {
+      try {
+        const today = format(new Date(), 'yyyy-MM-dd')
+        const res = await fetch(
+          `/api/admin/appointments?dateFrom=${today}T00:00:00.000Z&dateTo=${today}T23:59:59.999Z&pageSize=5&sortBy=startTime&sortOrder=asc`
+        )
+        if (!res.ok) throw new Error('Failed to fetch appointments')
+        const data = await res.json()
+        setTodaysAppointments(data.data)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setAppointmentsLoading(false)
+      }
+    }
+
+    fetchTodaysAppointments()
+  }, [])
 
   if (loading) {
     return (
@@ -220,38 +250,41 @@ export default function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="space-y-4">
-                  {/* Sample appointment card - replace with actual data */}
-                  <div className="border rounded-lg p-4 bg-muted">
-                    <div className="flex items-start space-x-4">
-                      <Clock className="h-5 w-5 text-brand-600 shrink-0" />
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-baseline">
-                          <h3 className="text-lg font-semibold text-foreground">
-                            John Doe
-                          </h3>
-                          <Badge variant="secondary">
-                            {AppointmentStatus.CONFIRMED}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Initial Consultation • 10:00 AM
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Room 101 • Dr. Smith
-                        </p>
-                      </div>
-                      <div className="flex items-baseline space-x-2 text-xs">
-                        <Button variant="ghost" size="sm">
-                          Check In
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          Reschedule
-                        </Button>
-                      </div>
-                    </div>
+                {appointmentsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
-                </div>
+                ) : todaysAppointments.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    No appointments scheduled for today
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {todaysAppointments.map((apt) => (
+                      <div key={apt.id} className="border rounded-lg p-4 bg-muted">
+                        <div className="flex items-start space-x-4">
+                          <Clock className="h-5 w-5 text-brand-600 shrink-0" />
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-baseline gap-2">
+                              <h3 className="text-lg font-semibold text-foreground">
+                                {apt.patient.name || 'Unknown Patient'}
+                              </h3>
+                              <Badge variant="secondary">{apt.status}</Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {apt.service.name} • {apt.time}
+                            </p>
+                            {apt.admin?.name && (
+                              <p className="text-xs text-muted-foreground">
+                                With {apt.admin.name}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -274,53 +307,14 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
           <TabsContent value="billing">
-            {/* Billing overview placeholder */}
             <Card className="bg-background">
               <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                  <CardTitle className="text-lg font-semibold">Billing Overview</CardTitle>
-                  <Button variant="outline" size="sm">
-                    Add Invoice
-                  </Button>
-                </div>
+                <CardTitle className="text-lg font-semibold">Billing Overview</CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-sm font-medium text-muted-foreground">
-                        Total Invoices
-                      </div>
-                      <div className="text-2xl font-semibold mt-1">
-                        124
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-sm font-medium text-muted-foreground">
-                        Paid This Month
-                      </div>
-                      <div className="text-2xl font-semibold mt-1">
-                        $8,450
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-sm font-medium text-muted-foreground">
-                        Pending
-                      </div>
-                      <div className="text-2xl font-semibold mt-1">
-                        $2,100
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-sm font-medium text-muted-foreground">
-                        Overdue
-                      </div>
-                      <div className="text-2xl font-semibold mt-1">
-                        $350
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-center text-muted-foreground py-8">
+                  Invoicing isn&apos;t built yet.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

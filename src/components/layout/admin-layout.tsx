@@ -12,14 +12,9 @@ import {
   LayoutDashboard,
   Calendar,
   Users,
-  Settings,
-  CreditCard,
-  BarChart3,
-  Bell,
   LogOut,
   ChevronLeft,
   ChevronRight,
-  User,
   Shield,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -27,15 +22,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getInitials } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
 
+// Analytics, Payments, Notifications, and Settings pages don't exist yet -
+// only list routes that are actually built until they are.
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Appointments', href: '/admin/appointments', icon: Calendar },
   { name: 'Schedule', href: '/admin/schedule', icon: Shield },
   { name: 'Patients', href: '/admin/patients', icon: Users },
-  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-  { name: 'Payments', href: '/admin/payments', icon: CreditCard },
-  { name: 'Notifications', href: '/admin/notifications', icon: Bell },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
 export function AdminSidebar() {
@@ -124,19 +117,6 @@ export function AdminHeader() {
               <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
             </div>
           </div>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/admin/settings" className="flex items-center gap-2 w-full">
-              <User className="h-4 w-4" />
-              Profile
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/admin/settings" className="flex items-center gap-2 w-full">
-              <Settings className="h-4 w-4" />
-              Settings
-            </Link>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => signOut({ callbackUrl: '/' })}

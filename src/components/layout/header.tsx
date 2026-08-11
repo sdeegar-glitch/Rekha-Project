@@ -82,7 +82,6 @@ export function Header() {
     { href: '/admin/appointments', label: 'Appointments', icon: Calendar },
     { href: '/admin/schedule', label: 'Schedule', icon: Settings },
     { href: '/admin/patients', label: 'Patients', icon: User },
-    { href: '/admin/settings', label: 'Settings', icon: Settings },
   ]
 
   return (
