@@ -45,7 +45,7 @@ export const userUpdateSchema = z.object({
   dateOfBirth: dateSchema.optional(),
   address: z.string().max(500).optional(),
   image: z.string().url().optional(),
-  preferences: z.record(z.any()).optional(),
+  preferences: z.record(z.string(), z.any()).optional(),
 })
 
 export const userPreferencesSchema = z.object({
@@ -54,12 +54,12 @@ export const userPreferencesSchema = z.object({
     email: z.boolean().default(true),
     sms: z.boolean().default(true),
     push: z.boolean().default(true),
-  }).default({}),
+  }).default({ email: true, sms: true, push: true }),
   calendar: z.object({
     view: z.enum(['day', 'week', 'month']).default('week'),
     startHour: z.number().int().min(0).max(23).default(9),
     endHour: z.number().int().min(1).max(24).default(18),
-  }).default({}),
+  }).default({ view: 'week', startHour: 9, endHour: 18 }),
 })
 
 // Auth schemas
@@ -214,7 +214,7 @@ export const paymentIntentSchema = z.object({
   amount: decimalSchema.positive(),
   currency: currencySchema.default('INR'),
   method: z.enum(['card', 'upi', 'netbanking', 'wallet']).optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
 })
 
 export const paymentConfirmSchema = z.object({
@@ -234,7 +234,7 @@ export const notificationCreateSchema = z.object({
   type: z.nativeEnum(NotificationType),
   title: z.string().min(1).max(200),
   message: z.string().min(1).max(2000),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.string(), z.any()).optional(),
 })
 
 export const notificationMarkReadSchema = z.object({
