@@ -201,6 +201,7 @@ model TimeSlot {
   parentSlot   TimeSlot?    @relation("RecurringSlots", fields: [parentSlotId], references: [id], onDelete: SetNull)
   childSlots   TimeSlot[]   @relation("RecurringSlots")
 
+  @@unique([availabilityId, startTime])
   @@index([availabilityId])
   @@index([serviceId])
   @@index([startTime])

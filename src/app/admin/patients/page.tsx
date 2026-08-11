@@ -17,6 +17,7 @@ export default function AdminPatients() {
 
   useEffect(() => {
     fetchPatients()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchPatients = async () => {

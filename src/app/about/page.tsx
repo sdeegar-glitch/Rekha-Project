@@ -1,4 +1,3 @@
-import Image from 'next/link' // fallback since we might not have actual image
 import Link from 'next/link'
 import { Award, BookOpen, Heart, Shield, GraduationCap, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -54,7 +53,7 @@ export default function AboutPage() {
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Led by Dr. Rekha Patel, our clinic is dedicated to providing compassionate, 
-                evidence-based psychological services to help you navigate life's challenges 
+                evidence-based psychological services to help you navigate life&apos;s challenges
                 and build a fulfilling future.
               </p>
               <div className="pt-4 flex flex-col sm:flex-row gap-4">

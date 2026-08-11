@@ -255,7 +255,7 @@ export const clinicSettingsUpdateSchema = z.object({
   cancellationPolicy: z.string().max(5000).optional(),
   reminderHours: positiveIntSchema.max(168).optional(),
   allowOnlinePayment: z.boolean().optional(),
-  stripeAccountId: z.string().optional(),
+  razorpayAccountId: z.string().optional(),
 })
 
 // Search schemas

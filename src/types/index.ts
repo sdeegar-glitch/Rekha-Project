@@ -297,16 +297,6 @@ export interface PaymentIntentResponse {
   currency: string
 }
 
-// Webhook event types
-export interface StripeWebhookEvent {
-  id: string
-  type: string
-  data: {
-    object: any
-  }
-  created: number
-}
-
 // Audit log entry
 export interface AuditLogEntry {
   id: string
@@ -341,7 +331,7 @@ export interface ClinicSettingsType {
   cancellationPolicy: string
   reminderHours: number
   allowOnlinePayment: boolean
-  stripeAccountId: string | null
+  razorpayAccountId: string | null
 }
 
 // Re-export Prisma enums

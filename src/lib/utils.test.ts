@@ -159,11 +159,12 @@ describe('Utility Functions', () => {
 
   describe('Time Slots Generation', () => {
     it('generates correct time slots', () => {
+      // A slot starting at 11:30 would run until 12:30, past the 12:00 window
+      // close, so it must be excluded — only 2 slots fit.
       const slots = getTimeSlots('09:00', '12:00', 60, 15)
-      expect(slots.length).toBe(3)
+      expect(slots.length).toBe(2)
       expect(slots[0]).toEqual({ start: '09:00', end: '10:00' })
       expect(slots[1]).toEqual({ start: '10:15', end: '11:15' })
-      expect(slots[2]).toEqual({ start: '11:30', end: '12:30' })
     })
   })
 

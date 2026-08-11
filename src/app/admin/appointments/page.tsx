@@ -17,6 +17,7 @@ export default function AdminAppointments() {
 
   useEffect(() => {
     fetchAppointments()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchAppointments = async () => {

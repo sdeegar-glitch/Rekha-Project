@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from 'sonner'
+import { useToast } from '@/hooks/use-toast'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -14,7 +14,8 @@ function AuthForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
-  
+  const { toast } = useToast()
+
   const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -37,12 +38,12 @@ function AuthForm() {
         })
 
         if (result?.error) {
-          toast.error('Invalid email or password')
+          toast({ title: 'Invalid email or password', variant: 'destructive' })
           setIsLoading(false)
           return
         }
 
-        toast.success('Logged in successfully!')
+        toast({ title: 'Logged in successfully!' })
         
         // Fetch session to determine role
         const session = await getSession()
@@ -70,12 +71,12 @@ function AuthForm() {
         const data = await res.json()
 
         if (!res.ok) {
-          toast.error(data.error || 'Registration failed')
+          toast({ title: data.error || 'Registration failed', variant: 'destructive' })
           setIsLoading(false)
           return
         }
 
-        toast.success('Account created! Logging you in...')
+        toast({ title: 'Account created! Logging you in...' })
         
         // Log them in immediately after registration
         const loginResult = await signIn('credentials', {
@@ -97,7 +98,7 @@ function AuthForm() {
         }
       }
     } catch (error) {
-      toast.error('An unexpected error occurred')
+      toast({ title: 'An unexpected error occurred', variant: 'destructive' })
     } finally {
       setIsLoading(false)
     }

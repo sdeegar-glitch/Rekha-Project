@@ -91,7 +91,7 @@ export default async function PortalPage() {
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <Calendar className="h-12 w-12 text-muted-foreground/50 mb-4" />
                 <h3 className="text-lg font-medium">No upcoming appointments</h3>
-                <p className="text-muted-foreground mt-1 max-w-sm mb-6">You don't have any therapy sessions scheduled at the moment.</p>
+                <p className="text-muted-foreground mt-1 max-w-sm mb-6">You don&apos;t have any therapy sessions scheduled at the moment.</p>
               </CardContent>
             </Card>
           )}

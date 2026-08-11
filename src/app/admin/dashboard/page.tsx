@@ -212,7 +212,7 @@ export default function AdminDashboard() {
             <Card className="bg-background">
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                  <CardTitle className="text-lg font-semibold">Today's Appointments</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Today&apos;s Appointments</CardTitle>
                   <Button variant="outline" size="sm">
                     New Appointment
                   </Button>

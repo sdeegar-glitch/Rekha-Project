@@ -68,19 +68,26 @@ export async function POST(request: NextRequest) {
         where: { email: validated.patientInfo.email },
       })
 
-      if (!user) {
-        user = await db.user.create({
-          data: {
-            email: validated.patientInfo.email,
-            name: validated.patientInfo.name,
-            phone: validated.patientInfo.phone,
-            dateOfBirth: new Date(validated.patientInfo.dateOfBirth),
-            address: validated.patientInfo.address,
-            emergencyContact: validated.patientInfo.emergencyContact,
-            role: 'PATIENT',
-          },
-        })
+      if (user) {
+        // This email already belongs to a registered account — require sign-in
+        // rather than silently attaching a guest booking to it.
+        return NextResponse.json(
+          { error: 'An account already exists for this email. Please sign in to book.' },
+          { status: 409 }
+        )
       }
+
+      user = await db.user.create({
+        data: {
+          email: validated.patientInfo.email,
+          name: validated.patientInfo.name,
+          phone: validated.patientInfo.phone,
+          dateOfBirth: new Date(validated.patientInfo.dateOfBirth),
+          address: validated.patientInfo.address,
+          emergencyContact: validated.patientInfo.emergencyContact,
+          role: 'PATIENT',
+        },
+      })
       patientId = user.id
       patientEmail = user.email
     }

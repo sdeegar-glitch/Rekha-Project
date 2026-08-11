@@ -734,7 +734,7 @@ export default function BookingPage() {
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-foreground">Secure Payment</h2>
                 <p className="text-muted-foreground mt-1">
-                  Pay securely with Stripe. Your payment details are encrypted and never stored on our servers.
+                  Pay securely with Razorpay. Your payment details are encrypted and never stored on our servers.
                 </p>
               </div>
 

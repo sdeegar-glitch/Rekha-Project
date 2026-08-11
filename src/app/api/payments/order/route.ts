@@ -31,9 +31,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Appointment is not in pending status' }, { status: 400 })
     }
 
+    // Amount is always derived from the service price server-side — never trust a client-supplied amount.
+    const amount = Number(appointment.service.price)
+
     // Create Razorpay order
     const order = await createRazorpayOrder(
-      Number(validated.amount),
+      amount,
       validated.currency,
       appointment.id
     )
@@ -43,7 +46,7 @@ export async function POST(request: NextRequest) {
       data: {
         appointmentId: appointment.id,
         patientId: appointment.patientId,
-        amount: validated.amount,
+        amount,
         currency: validated.currency,
         status: 'PENDING',
         razorpayOrderId: order.id,

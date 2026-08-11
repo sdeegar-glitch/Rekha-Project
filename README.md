@@ -6,7 +6,7 @@ A production-grade full-stack application designed specifically for clinical psy
 
 - **Professional Online Presence**: Beautiful, accessible website showcasing services and expertise
 - **Online Booking System**: 24/7 appointment scheduling with real-time availability
-- **Secure Payment Processing**: Integrated Stripe payments with automatic receipts
+- **Secure Payment Processing**: Integrated Razorpay payments with automatic receipts
 - **Admin Dashboard**: Comprehensive management interface for appointments, schedules, and patient data
 - **Real-time Features**: Live updates for booking changes, payments, and notifications
 - **Audit Trail**: Complete activity logging for compliance and security
@@ -34,8 +34,8 @@ A production-grade full-stack application designed specifically for clinical psy
 
 ### Technical Excellence
 - **Modern Stack**: Next.js 14, TypeScript, TailwindCSS, Shadcn UI
-- **Secure Authentication**: NextAuth.js v5 with multiple providers
-- **Payments**: Stripe Integration with webhook handling
+- **Secure Authentication**: NextAuth.js v4 with multiple providers
+- **Payments**: Razorpay Integration with webhook handling
 - **Real-time**: Socket.io for live updates
 - **Database**: PostgreSQL with Prisma ORM
 - **Deployment**: Docker Compose with nginx reverse proxy
@@ -60,10 +60,10 @@ A production-grade full-stack application designed specifically for clinical psy
 
 ### Backend
 - **API**: Next.js API Routes with tRPC for type-safe endpoints
-- **Authentication**: NextAuth.js v5 (Credentials, Google)
+- **Authentication**: NextAuth.js v4 (Credentials, Google)
 - **Database**: PostgreSQL with Prisma ORM
 - **Real-time**: Socket.io server with Redis adapter
-- **Payments**: Stripe API integration
+- **Payments**: Razorpay API integration
 - **Validation**: Zod schemas
 - **Logging**: Winston (configured in production)
 - **Caching**: Redis for Socket.io scaling
@@ -99,7 +99,7 @@ The system uses a normalized PostgreSQL schema designed for a psychology practic
 - **Availability**: Practitioner schedules with recurring patterns
 - **TimeSlots**: Individual bookable time intervals
 - **Appointments**: Booked sessions with status tracking and notes
-- **Payments**: Stripe-integrated payment records
+- **Payments**: Razorpay-integrated payment records
 - **Notifications**: Real-time alerts and communications
 - **AuditLogs**: Complete system activity trail
 - **ClinicSettings**: Practice configuration and preferences
@@ -119,8 +119,9 @@ The system uses a normalized PostgreSQL schema designed for a psychology practic
 - `GET /api/services` - List all active therapy services
 - `GET /api/availability/slots?serviceId=&date=` - Get available time slots
 - `POST /api/bookings` - Create new appointment booking
-- `POST /api/payments/intent` - Create Stripe payment intent
-- `POST /api/payments/webhook` - Stripe webhook handler
+- `POST /api/payments/order` - Create Razorpay order
+- `POST /api/payments/verify` - Verify Razorpay payment signature
+- `POST /api/payments/webhook` - Razorpay webhook handler
 
 ### Protected Patient Endpoints
 - `GET /api/patient/appointments` - List patient's appointments
@@ -152,7 +153,7 @@ The system uses a normalized PostgreSQL schema designed for a psychology practic
 - Docker Compose v2+
 - Node.js 20.x (for local development)
 - PostgreSQL 15+ (if not using Docker)
-- Stripe account (for payments)
+- Razorpay account (for payments)
 - Domain name with SSL certificate (for production)
 
 ### Local Development
@@ -284,11 +285,11 @@ NEXTAUTH_URL="https://yourdomain.com"
 NEXTAUTH_SECRET="your-32-plus-character-secret"
 ```
 
-#### Stripe
+#### Razorpay
 ```
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PUBLISHABLE_KEY="pk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
+RAZORPAY_KEY_ID="rzp_test_..."
+RAZORPAY_KEY_SECRET="..."
+RAZORPAY_WEBHOOK_SECRET="..."
 ```
 
 #### Email (Optional)
@@ -350,8 +351,8 @@ DOMAIN="yourdomain.com"
 3. **API Route**: Next.js API endpoint processes request, validates with Zod
 4. **Business Logic**: Prisma operations create/update database records
 5. **Real-time**: Socket.io server emits events to connected clients
-6. **Payment**: Stripe integration handles payment processing
-7. **Webhooks**: Stripe webhook updates payment status and triggers notifications
+6. **Payment**: Razorpay integration handles payment processing
+7. **Webhooks**: Razorpay webhook updates payment status and triggers notifications
 8. **Notifications**: Email/SMS sent via configured providers
 9. **Audit**: All actions logged to audit trail for compliance
 
@@ -477,7 +478,7 @@ While currently English-focused, the architecture supports i18n:
 - **Database**: `npx prisma studio` (development only)
 - **Network**: `docker-compose exec app ping database`
 - **Performance**: Monitor CPU/memory/disk usage
-- **Payments**: Check Stripe dashboard and webhook logs
+- **Payments**: Check Razorpay dashboard and webhook logs
 - **Real-time**: Verify Socket.io connections and events
 
 ## Licensing

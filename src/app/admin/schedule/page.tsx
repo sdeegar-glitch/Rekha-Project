@@ -14,6 +14,7 @@ export default function AdminSchedule() {
 
   useEffect(() => {
     fetchAvailability()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchAvailability = async () => {
@@ -58,7 +59,7 @@ export default function AdminSchedule() {
               </div>
             ) : availabilities.length === 0 ? (
               <div className="text-center p-8 text-muted-foreground border border-dashed rounded-lg">
-                No availability rules found. Click "Add Availability" to get started.
+                No availability rules found. Click &quot;Add Availability&quot; to get started.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
