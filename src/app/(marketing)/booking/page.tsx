@@ -36,6 +36,9 @@ interface BookingData {
   timeSlotId: string | null
   reason: string
   notes: string
+  bookedForSelf: boolean
+  bookedForName: string
+  bookedForRelationship: string
   patientInfo: {
     name: string
     email: string
@@ -69,6 +72,9 @@ export default function BookingPage() {
     timeSlotId: null,
     reason: '',
     notes: '',
+    bookedForSelf: true,
+    bookedForName: '',
+    bookedForRelationship: '',
     patientInfo: {
       name: '',
       email: '',
@@ -201,7 +207,9 @@ export default function BookingPage() {
         return (
           bookingData.patientInfo.name.length >= 2 &&
           bookingData.patientInfo.email.includes('@') &&
-          bookingData.patientInfo.phone.length >= 10
+          bookingData.patientInfo.phone.length >= 10 &&
+          (bookingData.bookedForSelf ||
+            (bookingData.bookedForName.length >= 2 && bookingData.bookedForRelationship.length > 0))
         )
       case 'payment':
         return true
@@ -245,15 +253,22 @@ export default function BookingPage() {
     setProcessingPayment(true)
     try {
       // 1. Create the appointment in the database (status PENDING)
-      const payload = { ...bookingData }
+      const payload: any = { ...bookingData }
       if (
-        payload.patientInfo?.emergencyContact && 
-        !payload.patientInfo.emergencyContact.name && 
+        payload.patientInfo?.emergencyContact &&
+        !payload.patientInfo.emergencyContact.name &&
         !payload.patientInfo.emergencyContact.phone
       ) {
         // Strip out the empty emergency contact object to prevent validation errors
         delete payload.patientInfo.emergencyContact
       }
+      if (!payload.bookedForSelf && payload.bookedForName && payload.bookedForRelationship) {
+        // keep bookedForName/bookedForRelationship as-is
+      } else {
+        delete payload.bookedForName
+        delete payload.bookedForRelationship
+      }
+      delete payload.bookedForSelf
 
       const bookingResponse = await fetch('/api/bookings', {
         method: 'POST',
@@ -601,20 +616,97 @@ export default function BookingPage() {
             <div>
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-foreground">Your Details</h2>
-                <p className="text-muted-foreground mt-1">Please provide your information for the appointment</p>
+                <p className="text-muted-foreground mt-1">
+                  {bookingData.bookedForSelf
+                    ? 'Please provide your information for the appointment'
+                    : "We'll use your contact details to manage the booking, plus a few details about who the appointment is for"}
+                </p>
               </div>
               <form className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <User className="h-5 w-5" />
-                      Personal Information
+                      Who is this appointment for?
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="inline-flex rounded-lg border border-input/60 bg-muted/30 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setBookingData((prev) => ({ ...prev, bookedForSelf: true }))}
+                        className={cn(
+                          'rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-150',
+                          bookingData.bookedForSelf
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        )}
+                      >
+                        Myself
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBookingData((prev) => ({ ...prev, bookedForSelf: false }))}
+                        className={cn(
+                          'rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-150',
+                          !bookingData.bookedForSelf
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        )}
+                      >
+                        Someone else
+                      </button>
+                    </div>
+
+                    {!bookingData.bookedForSelf && (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <Label htmlFor="bookedForName">Their full name *</Label>
+                          <Input
+                            id="bookedForName"
+                            value={bookingData.bookedForName}
+                            onChange={(e) =>
+                              setBookingData((prev) => ({ ...prev, bookedForName: e.target.value }))
+                            }
+                            placeholder="Who is this appointment for?"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="bookedForRelationship">Their relationship to you *</Label>
+                          <Select
+                            value={bookingData.bookedForRelationship}
+                            onValueChange={(value) =>
+                              setBookingData((prev) => ({ ...prev, bookedForRelationship: value }))
+                            }
+                          >
+                            <SelectTrigger id="bookedForRelationship">
+                              <SelectValue placeholder="Select relationship" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Child">Child</SelectItem>
+                              <SelectItem value="Spouse/Partner">Spouse/Partner</SelectItem>
+                              <SelectItem value="Parent">Parent</SelectItem>
+                              <SelectItem value="Sibling">Sibling</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      {bookingData.bookedForSelf ? 'Personal Information' : 'Your Contact Information'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
-                        <Label htmlFor="name">Full Name *</Label>
+                        <Label htmlFor="name">{bookingData.bookedForSelf ? 'Full Name *' : 'Your Full Name *'}</Label>
                         <Input
                           id="name"
                           value={bookingData.patientInfo.name}
@@ -813,6 +905,14 @@ export default function BookingPage() {
                     <span>{format(new Date(selectedSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}</span>
                     <span>{selectedService.duration} minutes</span>
                   </div>
+                  {!bookingData.bookedForSelf && bookingData.bookedForName && (
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>For</span>
+                      <span>
+                        {bookingData.bookedForName} ({bookingData.bookedForRelationship})
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-t pt-3 font-semibold">
                     <span>Total</span>
                     <span>₹{selectedService.price.toLocaleString()}</span>
@@ -891,6 +991,14 @@ export default function BookingPage() {
                         {format(new Date(selectedSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}
                       </span>
                     </div>
+                    {!bookingData.bookedForSelf && bookingData.bookedForName && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">For</span>
+                        <span className="font-medium">
+                          {bookingData.bookedForName} ({bookingData.bookedForRelationship})
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between border-t pt-3">
                       <span className="text-muted-foreground">Amount Paid</span>
                       <span className="font-medium">₹{selectedService.price.toLocaleString()}</span>

@@ -51,9 +51,10 @@ export default function AdminAppointments() {
     }
   }
 
-  const filtered = appointments.filter(a => 
+  const filtered = appointments.filter(a =>
     a.patient.name.toLowerCase().includes(search.toLowerCase()) ||
-    a.service.name.toLowerCase().includes(search.toLowerCase())
+    a.service.name.toLowerCase().includes(search.toLowerCase()) ||
+    a.bookedForName?.toLowerCase().includes(search.toLowerCase())
   )
 
   const getStatusBadge = (status: string) => {
@@ -114,6 +115,11 @@ export default function AdminAppointments() {
                         <td className="px-4 py-4">
                           <p className="font-medium">{apt.patient.name}</p>
                           <p className="text-xs text-muted-foreground">{apt.patient.email}</p>
+                          {apt.bookedForName && (
+                            <p className="text-xs text-primary mt-0.5">
+                              For {apt.bookedForName} ({apt.bookedForRelationship})
+                            </p>
+                          )}
                         </td>
                         <td className="px-4 py-4">{apt.service.name}</td>
                         <td className="px-4 py-4">

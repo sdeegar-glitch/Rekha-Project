@@ -130,6 +130,8 @@ export async function POST(request: NextRequest) {
           status: AppointmentStatus.PENDING,
           reason: validated.reason,
           notes: validated.notes,
+          bookedForName: validated.bookedForName,
+          bookedForRelationship: validated.bookedForRelationship,
         },
         include: {
           service: true,
@@ -155,7 +157,9 @@ export async function POST(request: NextRequest) {
           userId: newAppointment.adminId!,
           type: 'APPOINTMENT_CREATED',
           title: 'New Appointment Request',
-          message: `${newAppointment.patient.name} requested ${service.name} for ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}.`,
+          message: validated.bookedForName
+            ? `${newAppointment.patient.name} requested ${service.name} for ${validated.bookedForName} (${validated.bookedForRelationship}) on ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}.`
+            : `${newAppointment.patient.name} requested ${service.name} for ${format(new Date(timeSlot.startTime), 'MMMM d, yyyy \'at\' h:mm a')}.`,
           data: { appointmentId: newAppointment.id, patientName: newAppointment.patient.name },
         },
       })

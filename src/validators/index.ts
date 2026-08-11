@@ -114,6 +114,8 @@ export const appointmentCreateSchema = z.object({
   timeSlotId: idSchema,
   reason: z.string().max(1000).optional(),
   notes: z.string().max(2000).optional(),
+  bookedForName: z.string().min(2).max(100).optional(),
+  bookedForRelationship: z.string().min(2).max(50).optional(),
   patientInfo: z.object({
     name: z.string().min(2).max(100),
     email: emailSchema,
