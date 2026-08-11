@@ -31,9 +31,9 @@ export function Footer() {
   }
 
   const contactInfo = {
-    address: '2nd Floor, Wellness Center, 123 MG Road, Bangalore, Karnataka 560001',
-    phone: '+91-80-1234-5678',
-    email: 'info@rekhapatel.com',
+    address: '123 Wellness Avenue, Suite 200, Metropolis, NY 10001',
+    phone: '+1 (555) 123-4567',
+    email: 'hello@rekhapatelpsychology.com',
     hours: 'Mon-Fri: 9:00 AM - 6:00 PM\nSat: 10:00 AM - 2:00 PM\nSun: Closed',
   }
 
@@ -149,7 +149,7 @@ export function Footer() {
               </div>
               <div className="flex items-start gap-2 pt-2">
                 <span className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true">🕐</span>
-                <pre className="whitespace-pre-wrap">{contactInfo.hours}</pre>
+                <pre className="whitespace-pre-wrap font-sans">{contactInfo.hours}</pre>
               </div>
             </address>
           </div>

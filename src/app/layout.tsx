@@ -1,6 +1,6 @@
 // Root Layout
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Geist, Instrument_Serif } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
@@ -8,9 +8,17 @@ import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { Toaster } from '@/components/ui/toaster'
 
-const inter = Inter({
+const geist = Geist({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-geist',
+  display: 'swap',
+})
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument-serif',
   display: 'swap',
 })
 
@@ -70,7 +78,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
+    <html lang="en" className={`${geist.variable} ${instrumentSerif.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

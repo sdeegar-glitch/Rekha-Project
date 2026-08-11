@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { getInitials } from '@/lib/utils'
 import { useNotifications } from '@/hooks/useSocket'
 import { formatDistanceToNow } from 'date-fns'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 
 function NotificationsDropdown() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
@@ -113,7 +114,8 @@ export function Header() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
           {status === 'loading' ? (
             <div className="h-10 w-20 animate-pulse rounded-md bg-muted" />
           ) : session ? (

@@ -160,14 +160,11 @@ export default function HomePage() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
               <Link key={service.id} href={`/services/${service.slug}`} className="group">
-                <Card className="h-full transition-all hover:shadow-card-hover border-l-4" style={{ borderLeftColor: service.color }}>
+                <Card className="h-full border-t-2 border-t-transparent transition-all hover:border-t-primary hover:shadow-card-hover">
                   <CardHeader>
                     <div className="flex items-center gap-3 mb-3">
-                      <div 
-                        className="flex h-12 w-12 items-center justify-center rounded-lg" 
-                        style={{ backgroundColor: `${service.color}15` }}
-                      >
-                        <service.icon className="h-6 w-6" style={{ color: service.color }} />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                        <service.icon className="h-6 w-6 text-primary" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground">{service.name}</h3>
