@@ -171,6 +171,7 @@ export default function BookingPage() {
           bookingData.patientInfo.name.length >= 2 &&
           bookingData.patientInfo.email.includes('@') &&
           bookingData.patientInfo.phone.length >= 10 &&
+          /^\d{4}-\d{2}-\d{2}$/.test(bookingData.patientInfo.dateOfBirth) &&
           (bookingData.bookedForSelf ||
             (bookingData.bookedForName.length >= 2 && bookingData.bookedForRelationship.length > 0))
         )
@@ -269,18 +270,17 @@ export default function BookingPage() {
         }),
       })
 
-      if (!orderResponse.ok) throw new Error('Failed to create payment order')
-      const orderData = await orderResponse.json()
-
-      if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+      if (!orderResponse.ok || !process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
         toast({
           title: 'Payments unavailable',
-          description: 'Online payment is not configured yet. Please contact us to complete your booking.',
+          description:
+            "Your appointment is saved and pending — online payment isn't configured yet. Please contact us to complete your booking.",
           variant: 'destructive',
         })
         setProcessingPayment(false)
         return
       }
+      const orderData = await orderResponse.json()
 
       // Load Razorpay script dynamically
       const { loadScript } = await import('@/lib/loadScript')
@@ -993,20 +993,16 @@ export default function BookingPage() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
-            <Button
-              onClick={nextStep}
-              disabled={!canProceed() || processingPayment}
-              className="ml-auto"
-            >
-              {currentStep === 'payment' ? (
-                'Pay Now'
-              ) : (
-                <>
-                  Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+            {currentStep !== 'payment' && (
+              <Button
+                onClick={nextStep}
+                disabled={!canProceed() || processingPayment}
+                className="ml-auto"
+              >
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
         )}
 
