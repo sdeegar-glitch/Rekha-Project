@@ -20,6 +20,15 @@ COPY . .
 # Environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# NEXT_PUBLIC_* vars are inlined into the client bundle at build time, so
+# they must be explicitly declared as ARGs to receive the build args Render
+# automatically passes through from its dashboard env vars — anything not
+# declared here is silently dropped, even if it's set on Render.
+ARG NEXT_PUBLIC_RAZORPAY_KEY_ID
+ENV NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID
+ARG NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+
 RUN npm run build
 
 # Production image, copy all the files and run next
