@@ -52,12 +52,12 @@ interface BookingData {
   }
 }
 
-const STEPS: { id: BookingStep; title: string; description: string }[] = [
-  { id: 'service', title: 'Select Service', description: 'Choose your therapy type' },
-  { id: 'datetime', title: 'Date & Time', description: 'Pick a convenient slot' },
-  { id: 'details', title: 'Your Details', description: 'Enter your information' },
-  { id: 'payment', title: 'Payment', description: 'Secure online payment' },
-  { id: 'confirmation', title: 'Confirmation', description: 'Appointment confirmed' },
+const STEPS: { id: BookingStep; title: string }[] = [
+  { id: 'service', title: 'Select Service' },
+  { id: 'datetime', title: 'Date & Time' },
+  { id: 'details', title: 'Your Details' },
+  { id: 'payment', title: 'Payment' },
+  { id: 'confirmation', title: 'Confirmation' },
 ]
 
 export default function BookingPage() {
@@ -428,9 +428,6 @@ export default function BookingPage() {
               )
             })}
           </ol>
-          <p className="mt-4 text-sm text-muted-foreground">
-            {STEPS.find((s) => s.id === currentStep)?.description}
-          </p>
         </div>
 
         {/* Step Content */}
