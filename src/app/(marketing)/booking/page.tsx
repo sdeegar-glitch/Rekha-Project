@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils'
 import { format, parse, subYears, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, startOfDay } from 'date-fns'
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/hooks/use-toast'
-import { services } from '@/lib/constants'
+import { services, validationRules } from '@/lib/constants'
 
 type BookingStep = 'service' | 'datetime' | 'details' | 'payment' | 'confirmation'
 
@@ -169,7 +169,7 @@ export default function BookingPage() {
       case 'details':
         return (
           bookingData.patientInfo.name.length >= 2 &&
-          bookingData.patientInfo.email.includes('@') &&
+          validationRules.email.pattern.test(bookingData.patientInfo.email) &&
           bookingData.patientInfo.phone.length >= 10 &&
           /^\d{4}-\d{2}-\d{2}$/.test(bookingData.patientInfo.dateOfBirth) &&
           (bookingData.bookedForSelf ||
