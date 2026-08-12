@@ -430,8 +430,13 @@ export default function BookingPage() {
           </ol>
         </div>
 
-        {/* Step Content */}
-        <div className="animate-in fade-in slide-in-from-right-2">
+        {/* Step Content — fixed height on larger screens so the page doesn't
+            grow/shrink or jump as you move between steps of different
+            length; content that doesn't fit scrolls within this box instead
+            of the page. Left as natural page flow on mobile, where a short
+            fixed box with its own scroll is more awkward than just letting
+            the page scroll. */}
+        <div className="animate-in fade-in slide-in-from-right-2 sm:h-[640px] sm:overflow-y-auto sm:pr-2">
           {/* Step 1: Service Selection */}
           {currentStep === 'service' && (
             <div>
