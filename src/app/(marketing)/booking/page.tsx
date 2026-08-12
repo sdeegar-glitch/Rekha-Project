@@ -335,13 +335,8 @@ export default function BookingPage() {
       })
 
       if (verifyRes.ok) {
-        const data = await verifyRes.json()
         toast({ title: 'Success!', description: 'Your appointment has been booked', variant: 'success' })
         setCurrentStep('confirmation')
-        
-        setTimeout(() => {
-          router.push(`/booking/confirmation/${data.appointmentId}`)
-        }, 3000)
       } else {
         throw new Error('Verification failed')
       }
