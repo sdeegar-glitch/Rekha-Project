@@ -444,34 +444,36 @@ export default function BookingPage() {
                 <h2 className="text-2xl font-bold text-foreground">Select Your Service</h2>
                 <p className="text-muted-foreground mt-1">Choose the type of therapy that best fits your needs</p>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => (
                   <button
                     key={service.id}
                     onClick={() => handleServiceSelect(service.id)}
                     className={cn(
-                      'relative p-6 text-left transition-all border-2 rounded-xl',
+                      'relative p-3.5 text-left transition-all border-2 rounded-lg',
                       bookingData.serviceId === service.id
                         ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/20'
                         : 'border-border hover:border-brand-300 dark:hover:border-brand-700'
                     )}
                   >
                     {bookingData.serviceId === service.id && (
-                      <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-white">
-                        <CheckCircle className="h-4 w-4" />
+                      <div className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-white">
+                        <CheckCircle className="h-3 w-3" />
                       </div>
                     )}
-                    <div
-                      className="flex h-12 w-12 items-center justify-center rounded-lg mb-4"
-                      style={{ backgroundColor: `${service.color}15` }}
-                    >
-                      <service.icon className="h-6 w-6" style={{ color: service.color }} />
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                        style={{ backgroundColor: `${service.color}15` }}
+                      >
+                        <service.icon className="h-4 w-4" style={{ color: service.color }} />
+                      </div>
+                      <h3 className="font-semibold text-sm text-foreground leading-tight">{service.name}</h3>
                     </div>
-                    <h3 className="font-semibold text-foreground mb-1">{service.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{service.shortDescription}</p>
-                    <div className="flex items-center justify-between text-sm">
+                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{service.shortDescription}</p>
+                    <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">
-                        <Clock className="mr-1 h-4 w-4 inline" /> {service.duration} min
+                        <Clock className="mr-1 h-3 w-3 inline" /> {service.duration} min
                       </span>
                       <span className="font-semibold text-brand-600">
                         ₹{service.price.toLocaleString()}
