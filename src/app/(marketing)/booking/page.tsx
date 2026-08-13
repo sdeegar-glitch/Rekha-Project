@@ -1,7 +1,7 @@
 // Booking Page - Multi-step booking flow
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -92,6 +92,27 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [processingPayment, setProcessingPayment] = useState(false)
   const [dobPickerOpen, setDobPickerOpen] = useState(false)
+  const stepContentRef = useRef<HTMLDivElement>(null)
+  const [stepContentHeight, setStepContentHeight] = useState<number | null>(null)
+
+  // Track the current step's natural content height so the wizard box can
+  // animate smoothly to it — this keeps the box from jumping between steps
+  // while never leaving a bigger gap than the content actually needs.
+  useEffect(() => {
+    const el = stepContentRef.current
+    if (!el) return
+    const update = () => {
+      setStepContentHeight(window.innerWidth >= 640 ? el.scrollHeight : null)
+    }
+    update()
+    const resizeObserver = new ResizeObserver(update)
+    resizeObserver.observe(el)
+    window.addEventListener('resize', update)
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [])
 
   // Fetch available slots when service or date changes
   const fetchSlots = async (dateToFetch?: Date) => {
@@ -430,13 +451,18 @@ export default function BookingPage() {
           </ol>
         </div>
 
-        {/* Step Content — fixed height on larger screens so the page doesn't
-            grow/shrink or jump as you move between steps of different
-            length; content that doesn't fit scrolls within this box instead
-            of the page. Left as natural page flow on mobile, where a short
-            fixed box with its own scroll is more awkward than just letting
-            the page scroll. */}
-        <div className="animate-in fade-in slide-in-from-right-2 sm:h-[640px] sm:overflow-y-auto sm:pr-2">
+        {/* Step Content — animates to each step's actual content height on
+            larger screens, so the box never jumps abruptly between steps
+            but also never leaves a bigger gap than the content needs.
+            Content taller than the viewport still scrolls within this box
+            rather than the page. Left as natural page flow on mobile, where
+            a short fixed box with its own scroll is more awkward than just
+            letting the page scroll. */}
+        <div
+          className="transition-[height] duration-300 ease-in-out sm:overflow-y-auto sm:pr-2"
+          style={stepContentHeight ? { height: stepContentHeight, maxHeight: '80vh' } : undefined}
+        >
+        <div ref={stepContentRef} className="animate-in fade-in slide-in-from-right-2">
           {/* Step 1: Service Selection */}
           {currentStep === 'service' && (
             <div>
@@ -979,6 +1005,7 @@ export default function BookingPage() {
               </div>
             </div>
           )}
+        </div>
         </div>
 
         {/* Navigation Buttons */}
