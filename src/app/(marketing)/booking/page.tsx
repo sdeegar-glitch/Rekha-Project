@@ -1,7 +1,7 @@
 // Booking Page - Multi-step booking flow
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -92,27 +92,6 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [processingPayment, setProcessingPayment] = useState(false)
   const [dobPickerOpen, setDobPickerOpen] = useState(false)
-  const stepContentRef = useRef<HTMLDivElement>(null)
-  const [stepContentHeight, setStepContentHeight] = useState<number | null>(null)
-
-  // Track the current step's natural content height so the wizard box can
-  // animate smoothly to it — this keeps the box from jumping between steps
-  // while never leaving a bigger gap than the content actually needs.
-  useEffect(() => {
-    const el = stepContentRef.current
-    if (!el) return
-    const update = () => {
-      setStepContentHeight(window.innerWidth >= 640 ? el.scrollHeight : null)
-    }
-    update()
-    const resizeObserver = new ResizeObserver(update)
-    resizeObserver.observe(el)
-    window.addEventListener('resize', update)
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', update)
-    }
-  }, [])
 
   // Fetch available slots when service or date changes
   const fetchSlots = async (dateToFetch?: Date) => {
@@ -395,10 +374,10 @@ export default function BookingPage() {
   const selectedSlot = availableSlots.find((s) => s.id === bookingData.timeSlotId)
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <div className="py-6 sm:h-[calc(100vh-4rem)] sm:py-4 sm:overflow-hidden sm:flex sm:flex-col">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 w-full sm:flex sm:flex-1 sm:flex-col sm:min-h-0">
         {/* Progress Indicator */}
-        <div className="mb-10" role="navigation" aria-label="Booking progress">
+        <div className="mb-6 sm:shrink-0" role="navigation" aria-label="Booking progress">
           <div className="h-[3px] w-full bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-primary rounded-full transition-[width] duration-500 ease-out"
@@ -451,18 +430,15 @@ export default function BookingPage() {
           </ol>
         </div>
 
-        {/* Step Content — animates to each step's actual content height on
-            larger screens, so the box never jumps abruptly between steps
-            but also never leaves a bigger gap than the content needs.
-            Content taller than the viewport still scrolls within this box
-            rather than the page. Left as natural page flow on mobile, where
-            a short fixed box with its own scroll is more awkward than just
-            letting the page scroll. */}
-        <div
-          className="transition-[height] duration-300 ease-in-out sm:overflow-y-auto sm:pr-2"
-          style={stepContentHeight ? { height: stepContentHeight, maxHeight: '80vh' } : undefined}
-        >
-        <div ref={stepContentRef} className="animate-in fade-in slide-in-from-right-2">
+        {/* Step Content — fills whatever space remains between the progress
+            indicator and the nav buttons within the viewport-locked wizard
+            below sm, so the whole booking flow (header, steps, buttons)
+            fits on screen without scrolling; only the footer past it needs
+            a deliberate scroll. Content that still doesn't fit the
+            available space scrolls within this box as a safety net rather
+            than growing the page. Left as natural page flow on mobile. */}
+        <div className="sm:flex-1 sm:min-h-0 sm:overflow-y-auto sm:pr-2">
+        <div className="animate-in fade-in slide-in-from-right-2">
           {/* Step 1: Service Selection */}
           {currentStep === 'service' && (
             <div>
@@ -1010,7 +986,7 @@ export default function BookingPage() {
 
         {/* Navigation Buttons */}
         {currentStep !== 'confirmation' && (
-          <div className="mt-8 flex justify-between pt-6 border-t">
+          <div className="mt-8 flex justify-between pt-6 border-t sm:shrink-0">
             <Button
               variant="outline"
               onClick={prevStep}
