@@ -19,7 +19,7 @@ import { useSession } from 'next-auth/react'
 import { useToast } from '@/hooks/use-toast'
 import { services, validationRules } from '@/lib/constants'
 
-type BookingStep = 'service' | 'datetime' | 'details' | 'payment' | 'confirmation'
+type BookingStep = 'service' | 'date' | 'time' | 'details' | 'payment' | 'confirmation'
 
 interface TimeSlot {
   id: string
@@ -54,7 +54,8 @@ interface BookingData {
 
 const STEPS: { id: BookingStep; title: string }[] = [
   { id: 'service', title: 'Select Service' },
-  { id: 'datetime', title: 'Date & Time' },
+  { id: 'date', title: 'Choose Date' },
+  { id: 'time', title: 'Available Times' },
   { id: 'details', title: 'Your Details' },
   { id: 'payment', title: 'Payment' },
   { id: 'confirmation', title: 'Confirmation' },
@@ -164,8 +165,10 @@ export default function BookingPage() {
     switch (currentStep) {
       case 'service':
         return !!bookingData.serviceId
-      case 'datetime':
-        return !!bookingData.date && !!bookingData.timeSlotId
+      case 'date':
+        return !!bookingData.date
+      case 'time':
+        return !!bookingData.timeSlotId
       case 'details':
         return (
           bookingData.patientInfo.name.length >= 2 &&
@@ -243,7 +246,7 @@ export default function BookingPage() {
             variant: 'destructive',
           })
           setBookingData((prev) => ({ ...prev, timeSlotId: null }))
-          setCurrentStep('datetime')
+          setCurrentStep('time')
           if (selectedDate) fetchSlots(selectedDate)
           setProcessingPayment(false)
           return
@@ -487,96 +490,105 @@ export default function BookingPage() {
             </div>
           )}
 
-          {/* Step 2: Date & Time Selection */}
-          {currentStep === 'datetime' && selectedService && (
+          {/* Step 2: Date Selection */}
+          {currentStep === 'date' && selectedService && (
             <div>
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground">Select Date & Time</h2>
+                <h2 className="text-xl font-bold text-foreground">Choose a Date</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Available slots for {selectedService.name} ({selectedService.duration} min)
+                  Pick a date for your {selectedService.name} session ({selectedService.duration} min)
                 </p>
               </div>
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Calendar */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <CalendarIcon className="h-4 w-4" />
-                      Choose a Date
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={handleDateSelect}
-                      initialFocus={startOfDay(new Date())}
-                      fromDate={startOfDay(new Date())}
-                      toDate={addDays(new Date(), 60)}
-                      disabled={!bookingData.serviceId}
-                      className="w-full"
-                    />
-                    {!bookingData.serviceId && (
-                      <p className="text-center text-sm text-muted-foreground mt-4">
-                        Please select a service first
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Time Slots */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Clock className="h-4 w-4" />
-                      Available Times
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loadingSlots ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      </div>
-                    ) : !selectedDate ? (
-                      <p className="text-center text-sm text-muted-foreground py-8">
-                        Select a date to see available times
-                      </p>
-                    ) : availableSlots.length === 0 ? (
-                      <p className="text-center text-sm text-muted-foreground py-8">
-                        No available slots for this date
-                      </p>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                        {availableSlots.map((slot) => {
-                          const isSelected = bookingData.timeSlotId === slot.id
-                          const isTaken = slot.status !== 'AVAILABLE' && !isSelected
-                          return (
-                            <button
-                              key={slot.id}
-                              onClick={() => handleSlotSelect(slot.id)}
-                              disabled={isTaken}
-                              className={cn(
-                                'rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150',
-                                isSelected
-                                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                                  : isTaken
-                                    ? 'border-input/30 text-muted-foreground/50 line-through cursor-not-allowed'
-                                    : 'border-input/60 bg-background text-foreground hover:border-primary/50 hover:bg-accent'
-                              )}
-                            >
-                              {format(new Date(slot.startTime), 'h:mm a')}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="max-w-md mx-auto">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <CalendarIcon className="h-4 w-4" />
+                    Choose a Date
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDateSelect}
+                    initialFocus={startOfDay(new Date())}
+                    fromDate={startOfDay(new Date())}
+                    toDate={addDays(new Date(), 60)}
+                    disabled={!bookingData.serviceId}
+                    className="w-full"
+                  />
+                  {!bookingData.serviceId && (
+                    <p className="text-center text-sm text-muted-foreground mt-4">
+                      Please select a service first
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           )}
 
-          {/* Step 3: Patient Details */}
+          {/* Step 3: Time Selection */}
+          {currentStep === 'time' && selectedService && (
+            <div>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-foreground">Available Times</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {selectedDate
+                    ? `${format(selectedDate, 'EEEE, MMMM d, yyyy')} · ${selectedService.duration} min`
+                    : `Available slots for ${selectedService.name} (${selectedService.duration} min)`}
+                </p>
+              </div>
+              <Card className="max-w-2xl mx-auto">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Clock className="h-4 w-4" />
+                    Available Times
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {loadingSlots ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : !selectedDate ? (
+                    <p className="text-center text-sm text-muted-foreground py-8">
+                      Select a date to see available times
+                    </p>
+                  ) : availableSlots.length === 0 ? (
+                    <p className="text-center text-sm text-muted-foreground py-8">
+                      No available slots for this date
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      {availableSlots.map((slot) => {
+                        const isSelected = bookingData.timeSlotId === slot.id
+                        const isTaken = slot.status !== 'AVAILABLE' && !isSelected
+                        return (
+                          <button
+                            key={slot.id}
+                            onClick={() => handleSlotSelect(slot.id)}
+                            disabled={isTaken}
+                            className={cn(
+                              'rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                              isSelected
+                                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                                : isTaken
+                                  ? 'border-input/30 text-muted-foreground/50 line-through cursor-not-allowed'
+                                  : 'border-input/60 bg-background text-foreground hover:border-primary/50 hover:bg-accent'
+                            )}
+                          >
+                            {format(new Date(slot.startTime), 'h:mm a')}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Step 4: Patient Details */}
           {currentStep === 'details' && (
             <div>
               <div className="mb-4">
@@ -846,7 +858,7 @@ export default function BookingPage() {
             </div>
           )}
 
-          {/* Step 4: Payment */}
+          {/* Step 5: Payment */}
           {currentStep === 'payment' && selectedService && selectedSlot && (
             <div>
               <div className="mb-4">
@@ -932,7 +944,7 @@ export default function BookingPage() {
             </div>
           )}
 
-          {/* Step 5: Confirmation */}
+          {/* Step 6: Confirmation */}
           {currentStep === 'confirmation' && (
             <div className="text-center py-12">
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
