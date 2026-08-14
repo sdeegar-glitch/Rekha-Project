@@ -442,38 +442,38 @@ export default function BookingPage() {
           {/* Step 1: Service Selection */}
           {currentStep === 'service' && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Select Your Service</h2>
-                <p className="text-muted-foreground mt-1">Choose the type of therapy that best fits your needs</p>
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-foreground">Select Your Service</h2>
+                <p className="text-sm text-muted-foreground mt-1">Choose the type of therapy that best fits your needs</p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => (
                   <button
                     key={service.id}
                     onClick={() => handleServiceSelect(service.id)}
                     className={cn(
-                      'relative p-3.5 text-left transition-all border-2 rounded-lg',
+                      'relative p-2.5 text-left transition-all border-2 rounded-lg',
                       bookingData.serviceId === service.id
                         ? 'border-brand-600 bg-brand-50 dark:bg-brand-900/20'
                         : 'border-border hover:border-brand-300 dark:hover:border-brand-700'
                     )}
                   >
                     {bookingData.serviceId === service.id && (
-                      <div className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-white">
-                        <CheckCircle className="h-3 w-3" />
+                      <div className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-white">
+                        <CheckCircle className="h-2.5 w-2.5" />
                       </div>
                     )}
-                    <div className="flex items-center gap-2.5 mb-2">
+                    <div className="flex items-center gap-2 mb-1.5">
                       <div
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
                         style={{ backgroundColor: `${service.color}15` }}
                       >
-                        <service.icon className="h-4 w-4" style={{ color: service.color }} />
+                        <service.icon className="h-3.5 w-3.5" style={{ color: service.color }} />
                       </div>
-                      <h3 className="font-semibold text-sm text-foreground leading-tight">{service.name}</h3>
+                      <h3 className="font-semibold text-xs text-foreground leading-tight">{service.name}</h3>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{service.shortDescription}</p>
-                    <div className="flex items-center justify-between text-xs">
+                    <p className="text-[11px] text-muted-foreground mb-1.5 line-clamp-2">{service.shortDescription}</p>
+                    <div className="flex items-center justify-between text-[11px]">
                       <span className="text-muted-foreground">
                         <Clock className="mr-1 h-3 w-3 inline" /> {service.duration} min
                       </span>
@@ -490,9 +490,9 @@ export default function BookingPage() {
           {/* Step 2: Date & Time Selection */}
           {currentStep === 'datetime' && selectedService && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Select Date & Time</h2>
-                <p className="text-muted-foreground mt-1">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-foreground">Select Date & Time</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                   Available slots for {selectedService.name} ({selectedService.duration} min)
                 </p>
               </div>
@@ -500,8 +500,8 @@ export default function BookingPage() {
                 {/* Calendar */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CalendarIcon className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <CalendarIcon className="h-4 w-4" />
                       Choose a Date
                     </CardTitle>
                   </CardHeader>
@@ -527,8 +527,8 @@ export default function BookingPage() {
                 {/* Time Slots */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Clock className="h-4 w-4" />
                       Available Times
                     </CardTitle>
                   </CardHeader>
@@ -579,9 +579,9 @@ export default function BookingPage() {
           {/* Step 3: Patient Details */}
           {currentStep === 'details' && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Your Details</h2>
-                <p className="text-muted-foreground mt-1">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-foreground">Your Details</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                   {bookingData.bookedForSelf
                     ? 'Please provide your information for the appointment'
                     : "We'll use your contact details to manage the booking, plus a few details about who the appointment is for"}
@@ -590,8 +590,8 @@ export default function BookingPage() {
               <form className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <User className="h-4 w-4" />
                       Who is this appointment for?
                     </CardTitle>
                   </CardHeader>
@@ -663,8 +663,8 @@ export default function BookingPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <User className="h-4 w-4" />
                       {bookingData.bookedForSelf ? 'Personal Information' : 'Your Contact Information'}
                     </CardTitle>
                   </CardHeader>
@@ -849,9 +849,9 @@ export default function BookingPage() {
           {/* Step 4: Payment */}
           {currentStep === 'payment' && selectedService && selectedSlot && (
             <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Secure Payment</h2>
-                <p className="text-muted-foreground mt-1">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-foreground">Secure Payment</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                   Pay securely with Razorpay. Your payment details are encrypted and never stored on our servers.
                 </p>
               </div>
@@ -859,7 +859,7 @@ export default function BookingPage() {
               {/* Order Summary */}
               <Card className="mb-6">
                 <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
+                  <CardTitle className="text-base">Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
@@ -888,8 +888,8 @@ export default function BookingPage() {
               {/* Payment Form */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <CreditCard className="h-4 w-4" />
                     Payment Details
                   </CardTitle>
                 </CardHeader>
@@ -938,7 +938,7 @@ export default function BookingPage() {
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
                 <CheckCircle className="h-10 w-10 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Appointment Booked!</h2>
+              <h2 className="text-xl font-bold text-foreground mb-2">Appointment Booked!</h2>
               <p className="text-muted-foreground mb-8">
                 Your appointment has been confirmed. A confirmation email has been sent to{' '}
                 <strong>{bookingData.patientInfo.email}</strong>.

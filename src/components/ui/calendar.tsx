@@ -56,28 +56,28 @@ export function Calendar({
         }}
         classNames={{
           months: 'flex flex-col',
-          month: 'space-y-4 w-full relative',
-          month_caption: 'flex justify-center items-center h-9 relative font-medium text-foreground',
-          dropdowns: 'flex items-center justify-center gap-2',
+          month: 'space-y-2 w-full relative',
+          month_caption: 'flex justify-center items-center h-7 relative text-sm font-medium text-foreground',
+          dropdowns: 'flex items-center justify-center gap-1.5',
           dropdown_root: 'relative inline-flex items-center',
           dropdown:
-            'text-sm font-medium text-foreground bg-background border border-input/60 rounded-md pl-2 pr-1 py-1 cursor-pointer hover:border-primary/50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
-          caption_label: captionLayout === 'label' ? 'font-medium text-foreground' : 'hidden',
+            'text-xs font-medium text-foreground bg-background border border-input/60 rounded-md pl-1.5 pr-1 py-0.5 cursor-pointer hover:border-primary/50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
+          caption_label: captionLayout === 'label' ? 'text-sm font-medium text-foreground' : 'hidden',
           nav:
             captionLayout === 'label'
-              ? 'flex items-center justify-between absolute inset-x-0 top-0 h-9'
+              ? 'flex items-center justify-between absolute inset-x-0 top-0 h-7'
               : 'hidden',
           button_previous:
-            'h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors',
+            'h-6 w-6 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors',
           button_next:
-            'h-7 w-7 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors',
+            'h-6 w-6 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors',
           month_grid: 'w-full border-collapse',
           weekdays: 'flex',
-          weekday: 'text-muted-foreground w-9 font-normal text-xs',
-          week: 'flex w-full mt-1',
-          day: 'h-9 w-9 text-center text-sm p-0 relative',
+          weekday: 'text-muted-foreground w-8 font-normal text-[11px]',
+          week: 'flex w-full mt-0.5',
+          day: 'h-8 w-8 text-center text-xs p-0 relative',
           day_button:
-            'h-9 w-9 rounded-md p-0 font-normal inline-flex items-center justify-center transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
+            'h-8 w-8 rounded-md p-0 font-normal inline-flex items-center justify-center transition-colors hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
           today: 'font-semibold text-primary',
           outside: 'text-muted-foreground opacity-40',
           disabled: 'text-muted-foreground opacity-30 pointer-events-none',
