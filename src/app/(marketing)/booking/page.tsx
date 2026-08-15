@@ -377,7 +377,7 @@ export default function BookingPage() {
   const selectedSlot = availableSlots.find((s) => s.id === bookingData.timeSlotId)
 
   return (
-    <div className="py-6 sm:h-[calc(100vh-4rem)] sm:py-4 sm:overflow-hidden sm:flex sm:flex-col">
+    <div className="py-6 sm:h-screen-minus-header sm:py-4 sm:overflow-hidden sm:flex sm:flex-col">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 w-full sm:flex sm:flex-1 sm:flex-col sm:min-h-0">
         {/* Progress Indicator */}
         <div className="mb-6 sm:shrink-0" role="navigation" aria-label="Booking progress">
@@ -446,7 +446,7 @@ export default function BookingPage() {
           {currentStep === 'service' && (
             <div>
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground">Select Your Service</h2>
+                <h2 className="text-fluid-heading font-bold text-foreground">Select Your Service</h2>
                 <p className="text-sm text-muted-foreground mt-1">Choose the type of therapy that best fits your needs</p>
               </div>
               <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -494,7 +494,7 @@ export default function BookingPage() {
           {currentStep === 'date' && selectedService && (
             <div>
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground">Choose a Date</h2>
+                <h2 className="text-fluid-heading font-bold text-foreground">Choose a Date</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   Pick a date for your {selectedService.name} session ({selectedService.duration} min)
                 </p>
@@ -531,7 +531,7 @@ export default function BookingPage() {
           {currentStep === 'time' && selectedService && (
             <div>
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground">Available Times</h2>
+                <h2 className="text-fluid-heading font-bold text-foreground">Available Times</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {selectedDate
                     ? `${format(selectedDate, 'EEEE, MMMM d, yyyy')} · ${selectedService.duration} min`
@@ -592,7 +592,7 @@ export default function BookingPage() {
           {currentStep === 'details' && (
             <div>
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground">Your Details</h2>
+                <h2 className="text-fluid-heading font-bold text-foreground">Your Details</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {bookingData.bookedForSelf
                     ? 'Please provide your information for the appointment'
@@ -862,7 +862,7 @@ export default function BookingPage() {
           {currentStep === 'payment' && selectedService && selectedSlot && (
             <div>
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-foreground">Secure Payment</h2>
+                <h2 className="text-fluid-heading font-bold text-foreground">Secure Payment</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   Pay securely with Razorpay. Your payment details are encrypted and never stored on our servers.
                 </p>
@@ -950,7 +950,7 @@ export default function BookingPage() {
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
                 <CheckCircle className="h-10 w-10 text-green-600" />
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">Appointment Booked!</h2>
+              <h2 className="text-fluid-heading font-bold text-foreground mb-2">Appointment Booked!</h2>
               <p className="text-muted-foreground mb-8">
                 Your appointment has been confirmed. A confirmation email has been sent to{' '}
                 <strong>{bookingData.patientInfo.email}</strong>.

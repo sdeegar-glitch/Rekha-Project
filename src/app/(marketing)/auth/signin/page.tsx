@@ -105,20 +105,21 @@ function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
-      <div className="w-full max-w-md bg-card rounded-2xl shadow-xl overflow-hidden border border-border">
-        <div className="p-8 text-center bg-primary/5 border-b border-primary/10">
-          <h1 className="text-3xl font-display font-bold text-foreground tracking-tight">
+    <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4 sm:h-screen-minus-header sm:overflow-hidden">
+      <div className="w-full max-w-md bg-card rounded-2xl shadow-xl border border-border flex flex-col overflow-hidden sm:max-h-full">
+        <div className="overflow-y-auto">
+        <div className="p-6 sm:p-8 text-center bg-primary/5 border-b border-primary/10">
+          <h1 className="text-fluid-heading-lg font-display font-bold text-foreground tracking-tight">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
-          <p className="text-muted-foreground mt-2">
-            {isLogin 
-              ? 'Sign in to access your appointments and records.' 
+          <p className="text-sm text-muted-foreground mt-2">
+            {isLogin
+              ? 'Sign in to access your appointments and records.'
               : 'Sign up to book appointments and track your progress.'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4 sm:space-y-6">
           {!isLogin && (
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
@@ -215,6 +216,7 @@ function AuthForm() {
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </p>
+        </div>
         </div>
       </div>
     </div>

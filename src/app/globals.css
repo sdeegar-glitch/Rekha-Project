@@ -13,6 +13,29 @@
   }
 }
 
+/* Viewport height minus the fixed 4rem header, preferring dvh (accounts for
+   mobile browser chrome showing/hiding) with a vh fallback for browsers that
+   don't support it — the second declaration simply wins when supported. */
+@utility h-screen-minus-header {
+  height: calc(100vh - 4rem);
+  height: calc(100dvh - 4rem);
+}
+
+/* Fluid step/page heading size — scales continuously between viewport
+   widths instead of jumping at a breakpoint, so it reads well from a
+   360px phone through a 1920px monitor without a fixed-height wizard
+   box ever needing to grow to accommodate it. */
+@utility text-fluid-heading {
+  font-size: clamp(1.125rem, 1rem + 1vw, 1.5rem);
+}
+
+/* Larger fluid heading for single-focus hero-style cards (e.g. the auth
+   page title), which can afford to be a bit more prominent than the
+   space-constrained booking wizard's step headings above. */
+@utility text-fluid-heading-lg {
+  font-size: clamp(1.375rem, 1.1rem + 1.5vw, 1.875rem);
+}
+
 @theme {
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
